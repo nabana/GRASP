@@ -1,0 +1,118 @@
+<script>	
+	__host__.on_addTo = function(){ 
+		trace("Vector skin attached to ["+this.id+"]");
+        this.skinInstance.xCenter = 3;
+        this.skinInstance.yCenter = 10;
+	};
+ 
+ 	__host__.on_render = function(){ 
+	
+		var label = this.skinInstance.find('[id="label"]');
+		label.html(__host__.getPropertyValue("symbol")+"<span class='sub'>"+__host__.getPropertyValue("screenId")+"</span>");
+		label.css("left", -2);
+        var arrowCanvas = this.skinInstance.find('[id="arrowCanvas"]');
+        arrowCanvas[0].height = 20;
+        if(arrowCanvas[0].getContext) {
+            var cxt = arrowCanvas[0].getContext('2d');
+            cxt.moveTo(7,10);
+            cxt.lineTo(arrowCanvas.width(),10);
+			cxt.stroke();
+            cxt.moveTo(arrowCanvas.width()-13,6);
+            cxt.lineTo(arrowCanvas.width(),10);
+            cxt.lineTo(arrowCanvas.width()-13,14);
+            cxt.fill();
+			cxt.circle(4,10,3, false);
+        }
+        
+		arrowCanvas.setRotationCenter(3, arrowCanvas.outerHeight()/2);   
+        arrowCanvas.rotate(0);		 
+	};
+	
+	__host__.drawEllipse = function() {
+        var maxSize = 100;
+		var ellipseWrapper = this.skinInstance.find('[id="ellipseWrapper"]');
+        ellipseCanvas = $("<canvas/>", {
+                "style": "position:absolute;",
+				"class": 'toleranceEllipse',
+            });
+		
+		ellipseCanvas[0].height = maxSize;
+        ellipseCanvas[0].width = maxSize;
+		
+        this.skinInstance.data('ellipseCanvas', ellipseCanvas);
+		
+		if(ellipseCanvas[0].getContext) {
+            var cxt = ellipseCanvas[0].getContext('2d');
+            cxt.fillStyle   = '#3f6'; // lighgreen
+            cxt.strokeStyle = '#090'; // green
+            cxt.ellipse(maxSize/2,maxSize/2,maxSize/2-1,maxSize/2-1, true);
+        }
+
+		ellipseCanvas.appendTo(ellipseWrapper);
+        ellipseWrapper.css("position", "absolute");
+        ellipseWrapper.css("left", -maxSize/2+3);
+        ellipseWrapper.css("top", -maxSize/2+10);
+
+        ellipseCanvas.rotate(0);
+        ellipseCanvas.resize(60,60);		
+		
+        ellipseCanvas.attachRotateControl({
+            color: "green",
+            orientation: "left"
+        });
+
+        ellipseCanvas.attachResizeControl({
+            color: "blue"
+        });
+        
+		
+	};
+	
+	
+	__host__.onSelect = function () {
+		
+        var arrowCanvas = this.skinInstance.find('[id="arrowCanvas"]');
+        var label = this.skinInstance.find('[id="label"]');	
+			
+        arrowCanvas.attachRotateControl({
+            color: "orange",
+			rotateChange: function (oldangle, angle) {
+				if (angle > 180 || angle < 0) {
+				    label.css("top", 20);	
+				} else {
+                    label.css("top", -20);
+				}
+				
+				
+								
+			},
+
+        });
+        
+        __host__.drawEllipse();		
+	};
+	
+	
+    __host__.onDeselect = function () {
+        
+        var arrowCanvas = this.skinInstance.find('[id="arrowCanvas"]');
+        var ellipseCanvas = this.skinInstance.data('ellipseCanvas');
+
+        arrowCanvas.detachRotateControl();
+        ellipseCanvas.detachRotateControl();
+        ellipseCanvas.detachResizeControl();
+		
+		ellipseCanvas.remove();
+		
+    };
+    	
+ 	__host__.on_afterAdded = function(){ 
+	//	if (!this.isDummy) alert("e");
+	}	
+	
+</script>
+<div id="base" class="vectorBase">
+	<p id="label" class="instanceLabel">Vector</p>
+	<div id="ellipseWrapper" ><canvas id="ellipseCanvas" class="toleranceEllipse layer" width="20"></canvas></div>
+    <div id="arrowWrapper" ><canvas id="arrowCanvas" class="arrow borderedWhenSelected layer" width="95"></canvas></div>	
+<div id="childContainer"></div>

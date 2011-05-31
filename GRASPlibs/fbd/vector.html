@@ -1,0 +1,34 @@
+<script>
+	__host__.on_addTo = function(){ 
+		trace("Vector skin attached to ["+this.id+"]");
+	};
+ 
+ 	__host__.on_render = function(){ 
+
+		var label = this.skinInstance.find('[id="label"]');
+		label.html(__host__.getPropertyValue("symbol")+"<span class='sub'>"+__host__.getPropertyValue("screenId")+"</span>");
+		
+		var canvas = this.skinInstance.find('[id="myCanvas"]');
+		canvas[0].height = 20;
+	    if(canvas[0].getContext) {
+	        var cxt = canvas[0].getContext('2d');
+			
+			cxt.moveTo(0,10);
+			cxt.lineTo(canvas.width(),10);
+			cxt.lineTo(canvas.width()-5,7);
+			cxt.moveTo(canvas.width(),10);
+			cxt.lineTo(canvas.width()-5,13);			
+			cxt.stroke();
+    }
+
+	};
+	
+ 	__host__.on_afterAdded = function(){ 
+	//	if (!this.isDummy) alert("e");
+	}	
+	
+</script>
+<div id="base" class="vectorBase">
+	<p id="label" class="instanceLabel">Vector</p>
+	<canvas id="myCanvas" class="content" width="95"></canvas>
+<div id="childContainer"></div>

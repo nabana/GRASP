@@ -1,0 +1,434 @@
+/*
+ * 
+ * z-indexeding:
+ * 
+ * 
+ * .draggable:		100000
+ * 
+ * .panel:			250
+ * #inventory:		240
+ * #description:	230
+ * #belowDiagram:	220
+ * #title:			210
+ * #menuHolder:		100
+ * #mainContent:	0
+ * 
+ */
+
+html,body {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+	font-family: Arial;
+}
+
+#mainContent {
+    position:absolute;
+    height: 540px;
+    width: 960px;
+    margin-top: -270px;
+    margin-left: -480px;
+    top:50%;
+    left: 50%;
+    text-align: left;
+    overflow:hidden;
+	border: 1px solid black; 	
+	-moz-box-shadow: 0px 0px 20px black;
+	-webkit-box-shadow: 0px 0px 20px black;
+	/* box-shadow: 0px 0px 20px black; Too slow in IE9*/
+	z-index: 0px;
+}
+
+.draggedComponent {
+	-moz-box-shadow: 0px 0px 6px grey;
+	-webkit-box-shadow: 0px 0px 6px grey;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; 
+	filter: alpha(opacity=50);
+	opacity: .5;			
+}
+
+#menuHolder {
+	position:relative;	
+	float: right;
+	z-index: 100;
+}
+
+
+.panel {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 250;
+	background-image: url("../assets/1by1_grey_40.png");	
+}
+
+.panel .content {
+	background-color: white;
+    top:50%;
+    left: 50%;
+    text-align: left;
+    overflow:hidden;
+	border: 1px solid #3863a2;
+	-moz-box-shadow: 0px 0px 8px #666;
+	-webkit-box-shadow: 0px 0px 8px #666;
+	/* box-shadow: 0px 0px 8px #666;  Too slow in IE9*/
+    position:absolute;
+}
+
+.panel .inner {
+	overflow: hidden;
+	margin: 0px 10px 10px 10px;
+	padding: 10px;
+}
+
+.panel * h2 {
+	margin: 0px 0px 10px 0px;
+	background-color: #3863a2;
+	color: white;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 18px;
+	padding: 4px 5px 4px 5px;
+	font-weight: normal;
+}
+
+.panelClose {
+	position: relative;
+	float: right;
+	display: block;
+	top: -37px;
+	color: white;
+	text-decoration: none;	
+	padding: 1px 6px 1px 6px;
+	margin-right: 2px;
+}
+
+.panelClose:link,
+.panelClose:visited {
+	background-color: #7b0046;
+	border: 1px solid #aaaaaa;
+	color: #aaaaaa;
+}
+
+.panelClose:hover,
+.panelClose:active {
+	background-color: #9e005d;
+	border: 1px solid white;
+	color: white;
+}
+
+.inner {
+	padding: 10px;
+}
+
+#settingsPanel .content,
+#helpPanel .content  {
+    height: 450px;
+    width: 800px;
+    margin-top: -225px;
+    margin-left: -400px;
+}
+
+#pleaseWaitPanel .content {
+    height: 540px;
+    width: 960px;
+    margin-left: -480px;
+    margin-top: -270px;
+	text-align: center;
+	border: 1px solid #3863a2;
+	-moz-box-shadow: 0 0 0 0;
+	-webkit-box-shadow: 0 0 0 0;
+	/* box-shadow: 0 0 0 0;  Too slow in IE9*/
+	
+}
+
+#pleaseWaitPanel .inner.center {
+    height: 120px;
+    width: 400px;
+	text-align: center;
+	top: 50%;
+	left: 50%;
+	margin-left: -200px;
+	margin-top: -60px;
+	position: absolute;
+}
+
+.pleaseWaitText {
+	color: #566f94;
+	margin-top: 3px;
+	font-size: 16px;
+}
+
+#pleaseWaitStatus {
+	color: #859ec2;
+	font-size: 13px;
+	font-style: italic;	
+}
+
+#helpFrame {
+	position: relative;
+	width: 770px;
+	height: 390px;
+	left: 10px;
+	border: hidden;
+}
+
+body {
+    background-color: #314e70;
+}
+
+
+div#mainContent {
+  background-color: white;
+}
+
+.gridded {
+ 	background-image: url("../assets/grid.png");	
+}
+
+#menuHolder {
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;	
+}
+
+#menuHolder li {
+	list-style-type: none;
+	margin: 6px 2px 0px 2px;	
+	padding: 0px 2px 0px 2px;
+	float: left;
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;	
+	font-size: 9px;
+	font-weight: bold;
+	background-position: top center;
+	background-repeat: no-repeat;
+}
+
+#menuHolder li.clock {
+	padding: 0px 0px 0px 6px;
+	margin: 0px;
+}
+
+#menuHolder li a,
+#menuHolder li a:link,
+#menuHolder li a:visited {
+	padding: 29px 0px 0px;
+	color: #3863A2;
+	text-decoration: none;
+	display: block;
+}
+
+#menu {
+	margin: 0px;
+}
+
+#menuHolder li.disabled {
+	color: #a5a5a5;
+}
+
+#menuHolder li.disabled {
+	padding: 29px 2px 0px 2px;
+}
+
+#menuHolder li a:hover,
+#menuHolder li a:active {
+	color: #FF6600;
+}
+
+#saveButton {
+	background-image: url("../assets/save_off.png");
+}
+
+#saveButton:hover, #saveButton:active  {
+	background-image: url("../assets/save_on.png");
+}
+
+#previewButton {
+	background-image: url("../assets/test_off.png");
+}
+
+#previewButton:hover, #previewButton:active  {
+	background-image: url("../assets/test_on.png");
+}
+
+#undoButton {
+	background-image: url("../assets/undo_off.png");
+}
+
+#undoButton:hover, #undoButton:active  {
+	background-image: url("../assets/undo_on.png");
+}
+
+#undoButton.disabled  {
+	background-image: url("../assets/undo_disabled.png");
+}
+
+#redoButton {
+	background-image: url("../assets/redo_off.png");
+}
+
+#redoButton:hover, #redoButton:active  {
+	background-image: url("../assets/redo_on.png");
+}
+
+#redoButton.disabled  {
+	background-image: url("../assets/redo_disabled.png");
+}
+
+#settingsButton {
+	background-image: url("../assets/settings_off.png");
+}
+
+#settingsButton:hover, #settingsButton:active  {
+	background-image: url("../assets/settings_on.png");
+}
+
+#helpButton {
+	background-image: url("../assets/help_off.png");
+}
+
+#helpButton:hover, #helpButton:active  {
+	background-image: url("../assets/help_on.png");
+}
+
+#exitButton {
+	background-image: url("../assets/exit_off.png");
+}
+
+#exitButton:hover, #exitButton:active  {
+	background-image: url("../assets/exit_on.png");
+}
+
+div.clock {
+	font-family: "Gill Sans MT", Arial, Helvetica, sans-serif;
+	color: white;	
+	font-weight: normal;	
+	width: 148px;
+	height: 42px;
+	background-image:  url("../assets/timer_bg.png");
+	background-position: left top;
+	background-repeat: no-repeat;
+	text-align: center;
+	line-height: 38px;
+	padding-top: 2px;
+	cursor:default;
+}
+
+.clock_1 {
+	font-size: 12px;
+}
+
+.clock_2 {
+	font-size: 26px;
+	padding: 0px 8px 0px 8px;
+}
+
+.clock_3 {
+	font-size: 12px;
+	vertical-align: top;	
+}
+
+#title {
+	position: absolute;
+	z-index: 210;
+	font-family: VerdVerdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 24px;
+	padding: 5px 20px 3px 10px;
+	border-bottom: 1px solid black;
+	cursor:default;	
+	text-overflow: ellipsis-word;
+	max-width: 530px;	
+}
+
+#belowDiagram {
+	z-index: 220; 	
+	bottom: 0px;	
+	position: absolute;	
+	background-image: url("../assets/bottom_bg.png");
+	background-position: top;
+	background-repeat: no-repeat;;
+}
+
+#description {
+	z-index: 230;
+	font-family: VerdVerdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	padding: 0px 12px 0px 12px;
+	margin: 0px 0px 6px;
+	text-align: justify;
+	line-height: 15px;
+	cursor:default;	
+}
+
+#inventory {
+	z-index: 240; 
+	text-align: center;
+	overflow-x: hidden;
+	overflow-y: hidden;
+	width: 958px;
+	margin: 0px 1px 4px 1px;
+}
+
+#inventory:hover {
+	overflow-x: auto;	
+}
+
+#inventory ul {
+	list-style-type: none;
+	display: inline-block;
+	margin: 2px 0px 4px;
+	white-space: nowrap;
+	padding: 0px;
+}
+
+#inventory ul li {
+	list-style-type: none;
+	padding: 0px;
+	margin: 0px 10px 0px 10px;
+	display: inline-block;	
+	text-decoration: none;
+	color: black;
+	font-size: 10px;
+	cursor: pointer;	
+}
+
+#inventory ul li p {
+	margin: 3px 0px 0px 0px;	
+}
+
+#inventory ul li:hover,
+#inventory ul li:active {
+	color: #ff6600;	
+}
+
+#inventory ul li img {
+	border: none;
+	margin-bottom: -5px
+}
+
+#inventoryVisibilityControl {
+	position: absolute;
+	left: 0px;
+	bottom: 20px;
+	display: inline-block;
+	margin: 0px 0px 0px 0px;
+	cursor:pointer;
+}
+
+.componentControl { 
+	color: white; 
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+.nonselectable {
+ 	-webkit-user-select: none;	
+}
+
+.selectedComponent .borderedWhenSelected {
+	border: 1px dotted #ff6600;
+	border-collapse: collapse;
+	margin: -1px;
+}

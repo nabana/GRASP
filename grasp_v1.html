@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />	
+	<meta name="viewport" content="user-scalable=yes" />
+    <title>GRASP V1</title>
+    <!-- CSS libraries -->
+    <link href="css/grasp_skin.css" type="text/css" rel="stylesheet"/> 
+    <!-- // CSS libraries -->
+    
+    <!-- External JS libraries -->
+    <script src="inc/jquery.min.js" type="text/javascript"></script>
+    <script src="inc/x2j.js" type="text/javascript"></script>
+    <script src="inc/jquery.json2xml.js" type="text/javascript"></script>
+    <script src="inc/jquery.json-2.2.min.js" type="text/javascript"></script>
+	<script src="inc/jquery-ui.min.js" type="text/javascript"></script>
+	<script src="inc/jquery.topzindex.min.js" type="text/javascript"></script>
+
+    <!-- iPad support -->
+    <script src="inc/jquery.ui.ipad.js" type="text/javascript"></script>
+    <script src="inc/touch_drag_and_drop.js" type="text/javascript"></script>
+	
+	<!-- Context menu -->
+    <script src="inc/jquery.contextmenu.js" type="text/javascript"></script>
+		
+	<script src="inc/my_utils.js" type="text/javascript"></script>	    
+    <script src="inc/holo_common.js" type="text/javascript"></script> 
+    <script src="inc/grasp_main.js" type="text/javascript"></script>        
+    <!-- // External JS libraries -->
+    
+    <script type="text/javascript">
+    $(document).ready(function(){
+ 
+ 		player = new GRASPPlayer();
+        player.contentHolder = $("[id='mainContent']");                
+        player.loadDiagramDescriptorFromURL("diagrams/grasp_diagram_1.xml");        
+     });
+    
+    </script>
+</head>
+
+<body>
+<div id="mainContent">
+	<div id="menuHolder"></div>
+	<div id="title"></div>
+	<div id="belowDiagram">
+		<div id="description"></div>
+		<div id="inventory"></div>		
+	</div>
+</div>
+
+<!--  *********************************** PANELS *********************************** -->
+<div id="settingsPanel" class="panel" style="visible:hidden; display:none;">
+	<div class="panelBase">
+		<div class="content">
+			<h2>Config</h2>
+			<a class="panelClose" alt="Close Panel" href="javascript:window.player.on_settingsPanel_close();" title="Close config">x</a>
+		</div>
+	</div>
+</div>
+<div id="helpPanel" class="panel" style="visible:hidden; display:none;">
+	<div class="panelBase">
+		<div class="content">
+			<h2>Help</h2>			
+			<a class="panelClose" alt="Close Panel" href="javascript:window.player.on_helpPanel_close();" title="Close settings">x</a>
+			<iframe id="helpFrame" src="playback_help.html"></iframe>
+		</div>
+	</div>
+</div>
+<!--  *********************************** PLEASE WAIT *********************************** -->
+<div id="pleaseWaitPanel" class="panel">
+	<div class="panelBase">
+		<div class="content">
+			<div class="inner center">
+				<img src="assets/PleaseWait.gif"/>
+				<div class="pleaseWaitText">Please wait...</div>
+				<div id="pleaseWaitStatus">Initializing</div>				
+			</div>
+		</div>
+	</div>
+</div>
+<!--  *********************************** CONTEXT MENUS *********************************** -->
+<div id="componentMenu" style="display:none;width:200px;background-color:white;border:1px solid black;padding:5px;">
+    This is my custom context menu
+</div
+</body>
+</html>

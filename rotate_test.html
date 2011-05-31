@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title>Testing rotate</title>
+	    <script src="inc/jquery.min.js" type="text/javascript"></script>
+        <script src="inc/jquery-ui.min.js" type="text/javascript"></script>
+	    <script src="inc/rotate.js" type="text/javascript"></script>
+	    <script src="inc/transform_around.js" type="text/javascript"></script>
+        <script src="inc/my_utils.js" type="text/javascript"></script>		
+		<script>
+
+    $(document).ready(function(){
+ 
+        var ellipseCanvas = $('[id="ellipseCanvas"]');
+		var testPiece = $('[id="testPiece"]');
+		
+        ellipseCanvas[0].height = 80;
+        ellipseCanvas[0].width = 80;
+        if(ellipseCanvas[0].getContext) {
+            var cxt = ellipseCanvas[0].getContext('2d');
+            cxt.fillStyle   = '#3f6'; // lighgreen
+            cxt.strokeStyle = '#090'; // green
+            cxt.ellipse(40,40,39,39, true);
+            cxt.moveTo(0,40);
+            cxt.lineTo(80,40);
+            cxt.moveTo(40,0);
+            cxt.lineTo(40,80);
+			cxt.stroke();
+        }
+        		
+		testPiece.draggable();
+		
+		ellipseCanvas.setRotationCenter(40,40);
+  //      ellipseCanvas.rotate(45);
+//        ellipseCanvas.rotate(-40);
+//        ellipseCanvas.rotate(0);		
+
+       ellipseCanvas.attachRotateControl({
+           orientation: "right",
+           color: "orange"
+       });
+     
+	   ellipseCanvas.setResizeCenter(40,80);
+  //     ellipseCanvas.resize(80,80);              
+       ellipseCanvas.resize(20,20);              
+       ellipseCanvas.resize(80,80);              
+       ellipseCanvas.attachResizeControl({
+           color: "blue"
+       });
+
+//        ellipseCanvas.rotate(-40);
+
+//    ellipseCanvas.resize(20,80);
+    	
+        //$('#testPiece').resizable(); 
+		
+		function rotater() {
+			ellipseCanvas.rotate(Number(ellipseCanvas.css("rotate"))+2);
+		}
+		
+//		setInterval(rotater, 200);
+		
+     });
+ 
+		</script>
+		
+		<style>
+			#testPiece {
+				background-color: #999999;
+				cursor: pointer;
+			    height: 80px;
+				width: 80px;
+				top: 200px;
+				left: 200px;
+	
+			}
+			
+			#ellipseCanvas {
+                position: absolute;;
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="testPiece">
+		  <canvas id="ellipseCanvas" class="toleranceEllipse layer" width="20"></canvas>
+		</div>
+	</body>
+</html>

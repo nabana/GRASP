@@ -1,0 +1,232 @@
+<HoloLib id="FBD" version="1.0" cssURL="css/fbd.css" jsURL="js/fbd.js" rootComponentType="RootComponentType">
+    <description>
+        Some description of this library. Some description of this library. Some description of this library. Some description of this library.
+    </description>
+	<dictionary>
+		<term id="SET_SIZE_EXCEEDED">Set size exceeded.</term>		
+	</dictionary>
+    <quantities>
+        <quantity id="ForceMagnitude" symbol="F">
+            <units>
+                <unit id="Newton" symbol="N" isBase="true" factor="1"/>
+                <unit id="Kilonewton" symbol="kN" factor="10000"/>
+            </units>
+        </quantity>
+        <quantity id="Direction" symbol="dir">
+            <units>
+                <unit id="Degree" symbol="°" isBase="true">
+                    <factor>
+                        1
+                    </factor>
+                </unit>
+            </units>
+        </quantity>
+    </quantities>
+    <componentTypes>
+        <componentType id="RootComponentType" skinURL="root.html" internal="true">
+            <properties>
+                <set id="children" maxSize="3">
+					<dictionary>
+						<term id="SET_SIZE_EXCEEDED">Too many members.</term>		
+					</dictionary>
+					<memberType>
+						<reference targetType="*" visualizedAs="CONTAINMENT">
+							<constraints>
+								<constraint><![CDATA[
+									//trace(this.value+">"+this.presetValue.id);
+									return new Response(true);
+								]]></constraint>
+							</constraints>
+							<dictionary>
+								<term id="TYPE_MISMATCH">This memebertype can not be accepted here.</term>		
+							</dictionary>
+						</reference>
+					</memberType>
+                </set>
+				<group id="controlProperties">
+					<members>
+						<variable id="selectable" defaultValue="false"/>
+						<variable id="droppable" defaultValue="true"/>						
+					</members>
+				</group>					
+            </properties>
+        </componentType>
+        <componentType id="VectorType" label="Vector" skinURL="vector.html" iconURL="assets/vector_icon.png">
+            <description>
+                This is the component that represents a two-dimensional force vector.
+            </description>
+        	<onCreation><![CDATA[
+				if (!this.isDummy) {
+					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
+				}
+			]]></onCreation>		
+            <properties>
+				<variable id="symbol" label="Symbol" defaultValue="V">
+					<description>
+						Symbol of the component
+					</description>
+				</variable>
+				<variable id="screenId" label="Screen ID" defaultValue="x">
+					<description>
+						Screen ID of the component
+					</description>
+				</variable>
+                <variable id="magnitude" quantity="ForceMagnitude" label="magnitude" controlType="TF_REAL_WITH_QUANTITY">
+                    <description>
+                        Numerical value of the vector
+                    </description>
+                    <validRanges>
+                        <range type="CLOSED_RANGE" label="Positive or zero">
+                            0,*
+                        </range>
+                    </validRanges>
+                </variable>
+                <group id="visualProperties" label="Visual properties">
+                	<members>
+						<variable id="positionX" label="X" controlType="TF_INT" controlParameters="0,0,4" bindToSkinAttribute="positionX" defaultValue="0">
+		                    <description>
+		                        X coordinate
+		                    </description>
+		                </variable>
+		                <variable id="positionY" label="Y" controlType="TF_INT" controlParameters="70,0,4" bindToSkinAttribute="positionY" defaultValue="0">
+		                    <description>
+		                        Y coordinate
+		                    </description>
+		                </variable>
+		                <variable id="rotation" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="rotationZ"  defaultValue="0">
+		                    <description>
+		                        Rotation
+		                    </description>
+		                </variable>
+					</members>
+				</group>
+				<group id="controlProperties">
+					<members>
+						<variable id="draggable" defaultValue="true"/>
+					</members>
+				</group>					
+            </properties>
+        </componentType>
+        <componentType id="MomentType" label="Moment" symbol="M" skinURL="moment.html" iconURL="assets/moment_icon.png">
+            <description>
+                This components represents the tendency of the force twisting an object
+            </description>
+        	<onCreation><![CDATA[
+				if (!this.isDummy) {
+					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
+				}
+			]]></onCreation>		
+            <properties>
+				<variable id="symbol" label="Symbol" defaultValue="M">
+					<description>
+						Symbol of the component
+					</description>
+				</variable>
+				<variable id="screenId" label="Screen ID" defaultValue="x">
+					<description>
+						Screen ID of the component
+					</description>
+				</variable>
+                <variable id="direction" label="Direction" controlType="TF_INT" defaultValue="true" bindToSkinAttribute="reflectionY">
+                    <description>
+                        Direction of the moment
+                    </description>
+                    <validRanges>
+                        <range type="ENUM" label="clockwise or counter-clockwise">
+                            -1:"ccw",1:"cw"
+                        </range>
+                    </validRanges>
+                </variable>
+                <group id="visualProperties" label="Visual properties">
+					<members>
+                  <variable id="positionX" label="X" controlType="TF_INT" bindToSkinAttribute="positionX">
+                      <description>
+                          X coordinate
+                      </description>
+                  </variable>
+                  <variable id="positionY" label="Y" controlType="TF_INT" bindToSkinAttribute="positionY">
+                      <description>
+                          Y coordinate
+                      </description>
+                  </variable>
+					</members>
+				</group>
+				<group id="controlProperties">
+					<members>
+						<variable id="draggable" defaultValue="true"/>
+					</members>
+				</group>					
+            </properties>
+        </componentType>
+        <componentType id="ImageHolderType" label="Image holder" skinURL="image_holder.html" iconURL="assets/imageholder_icon.png">
+            <description>
+                This components represents a background image
+            </description>
+            <properties>
+                <variable id="direction" label="Direction" controlType="TF_INT" defaultValue="true" bindToSkinAttribute="reflectionY">
+                    <description>
+                        Direction of the moment
+                    </description>
+                    <validRanges>
+                        <range type="ENUM" label="clockwise or counter-clockwise">
+                            -1:"ccw",1:"cw"
+                        </range>
+                    </validRanges>
+                </variable>
+                <group id="visualProperties" label="Visual properties">
+					<members>                	
+		                <variable id="positionX" label="X" controlType="TF_INT" bindToSkinAttribute="positionX">
+		                    <description>
+		                        X coordinate
+		                    </description>
+		                </variable>
+		                <variable id="positionY" label="Y" controlType="TF_INT" bindToSkinAttribute="positionY">
+		                    <description>
+		                        Y coordinate
+		                    </description>
+		                </variable>
+					</members>
+				</group>
+				<group id="controlProperties">
+					<members>	
+						<variable id="draggable" defaultValue="true"/>
+					</members>
+				</group>					
+            </properties>
+        </componentType>
+        <componentType id="FatherType" label="Father" skinURL="father.html" internal="true">
+            <description>
+                This component represents a father
+            </description>
+            <properties>
+                <group id="visualProperties" label="Visual properties">
+					<members>
+		                <variable id="positionX" label="X" controlType="TF_INT" bindToSkinAttribute="positionX">
+		                    <description>
+		                        X coordinate
+		                    </description>
+		                </variable>
+		                <variable id="positionY" label="Y" controlType="TF_INT" bindToSkinAttribute="positionY">
+		                    <description>
+		                        Y coordinate
+		                    </description>
+		                </variable>
+					</members>
+				</group>
+	            <properties>
+	                <set id="children" label="children" minSize="0" maxSize="3" controlType="OBJ_REF_LIST">
+		                <description>
+		                    Children of the father
+		                </description>
+	                  <reference targetType="FatherType" visualizedAs="DIR_CONNECT_STRAIGHT"/>
+	                </set>
+	            </properties>
+            </properties>
+			<group id="controlProperties">
+				<members>
+					<variable id="draggable" defaultValue="true"/>
+				</members>
+			</group>					
+        </componentType>
+    </componentTypes>
+</HoloLib>

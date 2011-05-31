@@ -1,0 +1,72 @@
+.instanceLabel {
+  padding: 0px; 
+  margin: 0px; 
+  text-align: left;
+  color: black;
+  font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+  font-size: 14px; 
+  position: absolute;
+  top: -20px;
+  display: block;
+}
+
+.sub,
+.super {
+	font-size: 8px;	
+}
+
+.mainCanvas {
+	padding: 5px; 
+	height: 407px; 
+	width:543px; 
+}
+
+.mousePosDisplay {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	color: white;
+	position: absolute;
+	padding: 2px 4px 2px 4px;
+	margin: 0px 0px 0px 0px;
+	z-index: 100010;
+	background-color: #2c69a0;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=75)"; 
+	filter: alpha(opacity=75);
+	opacity: .75;	
+}
+
+.sampleImage {
+	background-image: url("../assets/sample_image.png");
+	background-repeat: no-repeat;
+	width: 905px;
+	height: 360px;
+	-webkit-user-select: none;
+}
+
+.vectorBase {
+	position: absolute;
+	width: 95px;
+	height: 20px;
+}
+
+.momentBase {	
+	position: absolute;
+	width: 44px;
+	height: 39px;
+}
+
+.momentImage {
+	display: block;
+}
+
+.toleranceEllipse {
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=25)"; 
+    filter: alpha(opacity=25);
+    opacity: .25; 
+	position: absolute;  
+}
+
+.selectedComponent .toleranceEllipse {
+	display: block;
+	border: none;
+}

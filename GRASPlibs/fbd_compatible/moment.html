@@ -1,0 +1,20 @@
+<script>
+	__host__.on_addTo = function(){ 
+		trace("Moment skin attached to ["+this.id+"]");
+	};
+ 	__host__.on_render = function(){
+		
+		var label = this.skinInstance.find('[id="label"]');
+		label.html(__host__.getPropertyValue("symbol")+"<span class='sub'>"+__host__.getPropertyValue("screenId")+"</span>");
+		 
+		var img = $(this.skinInstance.find('[id="myImg"]'));		
+		
+		img.attr("src","__libraryURL__/assets/moment_content.png");
+	};
+
+	
+</script>
+<div id="base" class="momentBase">
+	<p id="label" class="instanceLabel">Moment</p>
+	<div class="content"><img id="myImg" class="momentImage" width="44" height="39" class="nonselectable"/></div>
+</div>

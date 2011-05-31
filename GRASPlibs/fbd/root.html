@@ -1,0 +1,83 @@
+<script>
+	__host__.on_addTo = function(){ 
+		trace("Moment skin attached to ["+this.id+"]");
+		
+		this.skinInstance.disableSelection();
+		
+		this.skinInstance.css("width", "960px");
+		this.skinInstance.css("height", "370px");
+		this.skinInstance.css("top", "50px");		
+		
+		window.player.mainCanvas = $('.mainCanvas');
+		if (window.player._diagramDescriptor.showGrid == "true") {
+			window.player.mainCanvas.addClass('gridded');
+		}
+	
+		window.player.mousePosDisplay = $('.mousePosDisplay');
+	
+		window.player.mainCanvas.mousemove(function(e){
+			
+			var offset = window.player.mainCanvas.offset();
+						
+			window.player.mousePosDisplay.html('x:' + Math.round(e.pageX - offset.left) + ' y:' + Math.round(e.pageY - offset.top));
+			
+		});
+		
+		window.player.mainCanvas.mouseover(function(e){
+			window.player.mousePosDisplay.show();
+		});
+			
+		window.player.mainCanvas.mouseout(function(e){
+			window.player.mousePosDisplay.hide();
+		});
+				
+/*		window.player.mainCanvas.draggable({
+			containment: [-(4000-960),-(4000-540),0,0],
+		});
+*/	
+
+	};
+	
+	
+ 	__host__.on_render = function(){ 
+	};
+	
+	__host__.on_drop = function(e, ui) {
+		switch (window.dropMode) {
+			case "NEW_COMPONENT":
+				
+				window.holoComponentManager.operationManager.recordOperation("Create new component"); 
+				
+				var c = window.player.libraryManager.createNewComponentInstanceFromType(window.beingDraggedComponent.type.id);
+
+				var offset = window.player.mainCanvas.offset();	
+
+				//c.skinInstance.css("left", (e.pageX - offset.left));
+				//c.skinInstance.css("top", (e.pageY - offset.top));		
+				
+				c.moveTo(e.pageX - offset.left, e.pageY - offset.top);		
+				
+				var childrenSet = this.getProperty("children");
+				var response = childrenSet.addMemberForValue(c.id);
+												
+				if (response.result ===true) {
+					window.player.setSelection([c.id]);
+					window.holoComponentManager.operationManager.finishRecording(true);
+					
+					window.beingDraggedComponent.isDummy = true;
+					c.skinInstance.contextMenu('#componentMenu');
+					c.skinInstance.hide();
+					c.skinInstance.fadeIn(800);
+				} else {
+					window.holoComponentManager.operationManager.finishRecording(false);					
+					window.player.showMessage(response);
+				}
+				
+				
+				break;
+		}
+	}
+	
+</script>
+<div class="mousePosDisplay">x:0 y:0</div>
+<div id="childContainer" style="" class="mainCanvas"></div>
