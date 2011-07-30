@@ -1,4 +1,8 @@
-// Utility functions
+/**
+ * Utility functions
+ * @author naba
+ */
+
 /*
  * 
  * Loading CSS document and instert it as a link 
