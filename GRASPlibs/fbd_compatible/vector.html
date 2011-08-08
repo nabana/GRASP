@@ -3,10 +3,30 @@
 		trace("Vector skin attached to ["+this.id+"]");
         this.skinInstance.xCenter = 3;
         this.skinInstance.yCenter = 10;
+
+        // setting up skinAttributes
+        this.skinAttributes = {
+
+            vectorRotation: {
+                setValue: function (value) {
+                    // context is host
+                    trace("***************************************************** "+value);
+                    if (this.skinParts.arrowCanvas) this.skinParts.arrowCanvas.rotate(value);
+
+                },
+
+                getValue: function() {
+                    if (this.skinParts.arrowCanvas) return this.skinParts.arrowCanvas.rotate();
+                }
+
+            }
+
+        }
 	};
  
  	__host__.on_render = function(){ 
 	
+        // called after addeded to
 		var label = this.skinInstance.find('[id="label"]');
 		label.html(__host__.getPropertyValue("symbol")+"<span class='sub'>"+__host__.getPropertyValue("screenId")+"</span>");
 		label.css("left", -2);
@@ -25,13 +45,18 @@
         }
         
 		arrowCanvas.setRotationCenter(3, arrowCanvas.outerHeight()/2);   
-        arrowCanvas.rotate(0);		 
+        arrowCanvas.rotate(0);	
+
+        // registering skinparts for quicker seeking
+        this.skinParts = {};
+
+        this.skinParts.arrowCanvas = arrowCanvas;
 	};
 	
 	__host__.drawEllipse = function() {
         var maxSize = 100;
 		var ellipseWrapper = this.skinInstance.find('[id="ellipseWrapper"]');
-        ellipseCanvas = $("<canvas/>", {
+        var ellipseCanvas = $("<canvas/>", {
                 "style": "position:absolute;",
 				"class": 'toleranceEllipse',
             });
@@ -65,7 +90,8 @@
             color: "blue"
         });
         
-		
+        // registerng as skinpart
+        this.skinParts.ellipseCanvas = ellipseCanvas;
 	};
 	
 	
@@ -82,33 +108,60 @@
 				} else {
                     label.css("top", -20);
 				}
-				
-				
-								
+			    
+                var c = this.data("hostComponent");
+
+                var bindedProperty = c.skinAttributeBindingsToProperties['vectorRotation'];
+
+                if (bindedProperty) {
+                    trace("bindedProperty");
+                    window.holoComponentManager.operationManager.recordOperation("Rotate component"); 
+
+                    c.ignoreBindings = true; 
+                    try {
+                        var response = c.setPropertyValue(bindedProperty, c.skinAttributes['vectorRotation'].getValue(), false);
+                        trace("ITT!!!!!!");
+                    } catch(e) {
+                        var response = new Response(false);
+                    }
+                    c.ignoreBindings = false;
+
+                    window.holoComponentManager.operationManager.finishRecording(response.result);
+
+                    return response.result;
+                } else {
+                    return true;
+                }
+
+                return true;
 			},
 
         });
         
+        arrowCanvas.data('hostComponent', this);
         __host__.drawEllipse();		
 	};
 	
 	
     __host__.onDeselect = function () {
         
-        var arrowCanvas = this.skinInstance.find('[id="arrowCanvas"]');
-        var ellipseCanvas = this.skinInstance.data('ellipseCanvas');
+        var arrowCanvas = this.skinParts.arrowCanvas;
+        var ellipseCanvas = this.skinParts.ellipseCanvas;
 
         arrowCanvas.detachRotateControl();
         ellipseCanvas.detachRotateControl();
         ellipseCanvas.detachResizeControl();
 		
 		ellipseCanvas.remove();
+
+        this.skinParts.ellipseCanvas = null;
 		
     };
     	
  	__host__.on_afterAdded = function(){ 
 	//	if (!this.isDummy) alert("e");
-	}	
+	};	
+
 	
 </script>
 <div id="base" class="vectorBase">

@@ -401,6 +401,16 @@ PropertyInstance.prototype = {
                     this._parentComponent._setY(this._value);
                                     
                     break;
+
+                default:
+
+                    var attributeDescriptor = this._parentComponent.skinAttributes[this.type.bindToSkinAttribute];
+
+                    if (attributeDescriptor && isFunction(attributeDescriptor.setValue)) {
+                        attributeDescriptor.setValue.call(this._parentComponent);
+                    }
+
+                    break;
             }
         }
 
@@ -849,8 +859,9 @@ HoloSkin.prototype = {
     content: null,
     host: null,
 	properties:null,
+  
 	
-	registerProperty: function(propertyName, listener, transformator) {
+	registerProperty: function(propertyName, skinAttribute, transformator) {
 		var properties = this.properties || {};
 	
 	},
@@ -1163,11 +1174,13 @@ HoloComponent.prototype = {
     _presetPropertyValues: null,
     _oldPropertyValues: null,
 
-    _propertyBindings: null,
+    skinAttributeBindingsToProperties:null,
 
     _skinInstance: null,
     _containerElement: null,
     _childContainerElement: null,
+    skinParts: null,
+    skinAttributes: null,
 
     on_render: null,
     on_addTo: null,
@@ -1407,6 +1420,34 @@ HoloComponent.prototype = {
 
                 if ($.isFunction(this.on_render)) this.on_render.call(this);
 
+                if (!this.isDummy && this.type.propertyBindingsToSkinAttributes) {
+                    for (var skinAttribute in this.type.propertyBindingsToSkinAttributes) {
+                        switch (skinAttribute) {
+                            case "positionX":
+                                this._setX(isSet(this.skinInstance.xCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinInstance.xCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+                                break;
+                            case "positionY":
+                                this._setY(isSet(this.skinInstance.yCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinInstance.yCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+                                break;								
+
+                            default: 
+                                    
+                                if (this.skinAttributes) {
+                                    var attributeDescriptor = this.skinAttributes[skinAttribute];
+
+                                    if (attributeDescriptor && $.isFunction(attributeDescriptor.setValue)) {
+                                        var reverseBindings = this.skinAttributeBindingsToProperties = this.skinAttributeBindingsToProperties || {};
+                                        reverseBindings[skinAttribute] = this.type.propertyBindingsToSkinAttributes[skinAttribute];
+                                        attributeDescriptor.setValue.call(this, this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+                                    }
+                                }
+
+                                break;
+                        }  
+                    }
+                }
+
+
                 if (this._childComponents && this._childContainerElement){
                     for (var i = 0; i < this._childComponents.length; i++){
                         this._childComponents[i].render(refreshSkin);
@@ -1437,22 +1478,11 @@ HoloComponent.prototype = {
                     }
                 }
                 
-                if (!this.isDummy && this.type.propertyBindingsToSkinAttributes) {
-                    for (var skinAttribute in this.type.propertyBindingsToSkinAttributes) {
-                        switch (skinAttribute) {
-                            case "positionX":
-                                this._setX(isSet(this.skinInstance.xCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinInstance.xCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
-                                break;
-                            case "positionY":
-                                this._setY(isSet(this.skinInstance.yCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinInstance.yCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
-                                break;								
-                        }  
-                    }
-                }
 
             }
 
             trace("HoloComponent with id:[" + this.id + "] added.");
+
 
             this.render();
 
@@ -1498,7 +1528,7 @@ HoloComponent.prototype = {
         }        
        
         this.ignoreBindings = true; 
-        var response = this.setPropertyValues(presetValues, ignoreConstraints, true);
+        var response = this.setPropertyValues(presetValues, ignoreConstraints);
         this.ignoreBindings = false;
                 
         if (response.result) {
@@ -1564,9 +1594,6 @@ HoloComponent.prototype = {
             delete this._skinInstance;
         }
 
-        var skinInitObj = {
-            hostComponent: this,
-        }
 
         //var markup = "<div id="+this.id+" class='skinInstance'><div class='skinWrapper'>"+skinString+"</div></div>";
         var markup = this.markupTemplate.replace(/__skinContent__/ig, skinString);
@@ -1626,7 +1653,7 @@ HoloComponent.prototype = {
             }
         }
 
-        this._skinInstance.hostComponent = this;
+        this._skinInstance.data("hostComponent",this);
 
         this._childContainerElement = this._skinInstance.find("[id='" + this.id + "-childContainer']");
 

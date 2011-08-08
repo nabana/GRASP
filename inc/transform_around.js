@@ -549,11 +549,12 @@ $(document).mousemove(function(e){
 			var newAngle = (mX < 0) ? 180 + (Math.atan(mY / mX) / Math.PI * 180 - angleOffset) : Math.atan(mY / mX) / Math.PI * 180 - angleOffset;
 			var host = wrapper.data("host");
 			var oldAngle = wrapper.data("host").css('rotate');
-			host.rotate(newAngle);
 	        var rotateChange = target.data("rotateChange"); 
 	        if (rotateChange) {
-	            rotateChange.call(host, oldAngle, newAngle);
-	        }			
+	            if (rotateChange.call(host, oldAngle, newAngle)) host.rotate(newAngle); 
+	        } else {
+			    host.rotate(newAngle);
+            }
 		}
 		
 	} else if (target = window.beingResized) {

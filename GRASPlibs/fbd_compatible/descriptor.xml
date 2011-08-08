@@ -93,7 +93,7 @@
 		                        Y coordinate
 		                    </description>
 		                </variable>
-		                <variable id="rotation" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="vectorRotation"  defaultValue="0">
+		                <variable id="rotation" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="vectorRotation"  defaultValue="90">
 		                    <description>
 		                        Rotation
 		                    </description>
