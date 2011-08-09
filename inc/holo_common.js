@@ -406,8 +406,8 @@ PropertyInstance.prototype = {
 
                     var attributeDescriptor = this._parentComponent.skinAttributes[this.type.bindToSkinAttribute];
 
-                    if (attributeDescriptor && isFunction(attributeDescriptor.setValue)) {
-                        attributeDescriptor.setValue.call(this._parentComponent);
+                    if (attributeDescriptor && $.isFunction(attributeDescriptor.setValue)) {
+                        attributeDescriptor.setValue.call(this._parentComponent, this._value);
                     }
 
                     break;
@@ -949,6 +949,7 @@ HoloComponentType.prototype = {
     _propertyTypes: null,
     propertyBindingsToSkinAttributes:null,
     constraints: null,
+    dictionary: null,
 
     on_creation: null,
 
@@ -969,6 +970,11 @@ HoloComponentType.prototype = {
         this.skinURL = this.parentLibrary.baseURL + "/" + jsonObj["@skinURL"];
         if (jsonObj["@iconURL"]) this.iconURL = this.parentLibrary.baseURL + "/" + jsonObj["@iconURL"];
         this.initialized = false;
+
+        this.dictionary = new Dictionary();
+        if (jsonObj["dictionary"] && jsonObj["dictionary"].length){
+            this.dictionary.initFromJSONObj(jsonObj["dictionary"][0]);
+        }
 
         if (jsonObj.properties && jsonObj.properties.length){
             var types = initPropertyTypesFromJSONObj(jsonObj.properties[0], this, null);
@@ -1162,7 +1168,7 @@ function HoloComponent(typeId, id, isDummy){
 
 HoloComponent.prototype = {
     id: null,
-    _type: null,
+    type: null,
 
     parentComponent: null,
     // Array, containing the children
@@ -1171,7 +1177,7 @@ HoloComponent.prototype = {
     _childComponentIndexForId: null,
 
     _properties: null,
-    _presetPropertyValues: null,
+    presetPropertyValues: null,
     _oldPropertyValues: null,
 
     skinAttributeBindingsToProperties:null,
@@ -1262,29 +1268,63 @@ HoloComponent.prototype = {
             }
         }
 
-        this._presetPropertyValues = this._presetPropertyValues || {};
-        this._presetPropertyValues[propertyId] = presetValue;
+        this.presetPropertyValues = this.presetPropertyValues || {};
+        this.presetPropertyValues[propertyId] = presetValue;
 
         if (!ignoreConstraints){
 
-            testResponse = this.testPresetPropertyValues();
+            var testResponse = this.testPresetPropertyValues();
 
             if (testResponse.result === true){
-                this.usePresetProperyValues();
-                return new Response(true);
+                var response2 = this.usePresetProperyValues();
+                delete this.presetPropertyValues[propertyId];
+                return response2;
             }
             else{
               
-                delete this._presetPropertyValues[propertyId];
+                delete this.presetPropertyValues[propertyId];
                 return testResponse;
             }
 
         } else{
             this.usePresetProperyValues();
+            delete this.presetPropertyValues[propertyId];
             return new Response(true);
         }
 
     },
+
+    testPropertyValue: function(propertyId, presetValue){
+
+        this._properties = this._properties || {};
+
+        if (!isSet(this._properties[propertyId])){
+            var createResponse = this.createProperty(propertyId);
+            if (!createResponse.result){
+                return createResponse;
+            }
+        }
+
+        this.presetPropertyValues = this.presetPropertyValues || {};
+        this.presetPropertyValues[propertyId] = presetValue;
+
+
+        var testResponse = this.testPresetPropertyValues();
+
+        if (testResponse.result === true){
+             var response2 = this.usePresetProperyValues();
+             delete this.presetPropertyValues[propertyId];
+             return response2;
+        } else{
+           
+           delete this.presetPropertyValues[propertyId];
+           return testResponse;
+        }
+
+        return new Response(true);
+
+    },
+    
 
     setPropertyValues: function(presetValues, ignoreConstraints){
 
@@ -1294,20 +1334,27 @@ HoloComponent.prototype = {
             if (!isSet(this._properties[propertyId])){
                 var createResponse = this.createProperty(propertyId);
                 if (!createResponse.result){
+
+                    this.presetPropertyValues = null;
                     return createResponse;
                 }
             }
         }
 
         if (!ignoreConstraints){
-            this._presetPropertyValues = presetValues;
+            this.presetPropertyValues = presetValues;
 
-            testResponse = this.testPresetPropertyValues();
+            var testResponse = this.testPresetPropertyValues();
             if (testResponse.result === true){
                 this.usePresetProperyValues();
+
+                this.presetPropertyValues = null;
+
                 return new Response(true);
             }
             else{
+                this.presetPropertyValues = null;
+
                 return testResponse;
             }
 
@@ -1321,6 +1368,39 @@ HoloComponent.prototype = {
 
     },
 
+    testPropertyValues: function(presetValues){
+
+        this._properties = this._properties || {};
+
+        for (var propertyId in presetValues){
+            if (!isSet(this._properties[propertyId])){
+                var createResponse = this.createProperty(propertyId);
+                if (!createResponse.result){
+
+                    this.presetPropertyValues = null;
+                    return createResponse;
+                }
+            }
+        }
+
+       this.presetPropertyValues = presetValues;
+
+       var testResponse = this.testPresetPropertyValues(); // HERE
+       if (testResponse.result === true){
+
+            this.presetPropertyValues = null;
+
+            return new Response(true);
+       } else {
+            this.presetPropertyValues = null;
+            return testResponse;
+        }
+        
+
+        return new Response(true);
+    },
+
+
     testPresetPropertyValues: function(){
         return this.type.constraints.checkOn(this);
     },
@@ -1330,26 +1410,27 @@ HoloComponent.prototype = {
 
         var changedPropertyIds = [];
 
-        for (var key in this._presetPropertyValues){
+        for (var key in this.presetPropertyValues){
             this._oldPropertyValues[key] = this.getPropertyValue(key);
             var property = this.getProperty(key);
 
             changedPropertyIds.push(property.id);
-            var response = property.setValue(this._presetPropertyValues[key]);
-            if (response.result = false){
+            var response = property.setValue(this.presetPropertyValues[key]);
+            if (response.result == false){
                 // rollingback
                 for (var key2 in this._oldPropertyValues){
                     var property2 = this.getProperty(key2);
                     property.setValue(this._oldPropertyValues[key2], true);
                 }
                 
-                this._presetPropertyValues = {};                
+                this.presetPropertyValues = {};                
                 return response;
             }
         }
 
-        this._presetPropertyValues = {};
+        this.presetPropertyValues = {};
         this.dispatchEvent("PROPERTYVALUES_CHANGED", this.id, changedPropertyIds);
+        return response;        
     },
 
     deleteProperty: function(propertyId){
@@ -1424,10 +1505,10 @@ HoloComponent.prototype = {
                     for (var skinAttribute in this.type.propertyBindingsToSkinAttributes) {
                         switch (skinAttribute) {
                             case "positionX":
-                                this._setX(isSet(this.skinInstance.xCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinInstance.xCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+                                this._setX(isSet(this.skinXCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinXCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
                                 break;
                             case "positionY":
-                                this._setY(isSet(this.skinInstance.yCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinInstance.yCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+                                this._setY(isSet(this.skinYCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinYCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
                                 break;								
 
                             default: 
@@ -1520,11 +1601,11 @@ HoloComponent.prototype = {
         
         
         if (!this.isDummy && isSet(this.type.propertyBindingsToSkinAttributes["positionX"])) {
-          presetValues[this.type.propertyBindingsToSkinAttributes["positionX"]] = (isSet(this.skinInstance.xCenter) && !ignoreCenter) ? this.skinInstance.xCenter+xC : xC; 
+          presetValues[this.type.propertyBindingsToSkinAttributes["positionX"]] = (isSet(this.skinXCenter) && !ignoreCenter) ? this.skinXCenter+xC : xC; 
         }
         
         if (!this.isDummy && isSet(this.type.propertyBindingsToSkinAttributes["positionY"])) {
-          presetValues[this.type.propertyBindingsToSkinAttributes["positionY"]] = (isSet(this.skinInstance.yCenter) && !ignoreCenter) ? this.skinInstance.yCenter+yC : yC;
+          presetValues[this.type.propertyBindingsToSkinAttributes["positionY"]] = (isSet(this.skinYCenter) && !ignoreCenter) ? this.skinYCenter+yC : yC;
         }        
        
         this.ignoreBindings = true; 
@@ -1534,6 +1615,47 @@ HoloComponent.prototype = {
         if (response.result) {
 		  this.skinInstance.css("left", xC);
           this.skinInstance.css("top", yC);
+        } else {
+          var p = this.skinInstance.data("originalPos");
+          if (isSet(p)) {
+    		  this.skinInstance.css("left", p.left);
+              this.skinInstance.css("top", p.top);
+          } else {
+              var left = this.type.getDefaultValueForProperty(this.type.propertyBindingsToSkinAttributes["positionX"]);
+              var top = this.type.getDefaultValueForProperty(this.type.propertyBindingsToSkinAttributes["positionX"]);
+    		  this.skinInstance.css("left", left);
+              this.skinInstance.css("top", top);
+//                defaultValue
+          }
+        }
+        
+        return response; 
+                
+      }
+      
+    },
+    
+    testMoveTo: function(xC, yC, ignoreConstraints, ignoreCenter) {
+      
+      if (this.skinInstance) {
+        
+        var presetValues = {};
+        
+        
+        if (!this.isDummy && isSet(this.type.propertyBindingsToSkinAttributes["positionX"])) {
+          presetValues[this.type.propertyBindingsToSkinAttributes["positionX"]] = (isSet(this.skinXCenter) && !ignoreCenter) ? this.skinXCenter+xC : xC; 
+        }
+        
+        if (!this.isDummy && isSet(this.type.propertyBindingsToSkinAttributes["positionY"])) {
+          presetValues[this.type.propertyBindingsToSkinAttributes["positionY"]] = (isSet(this.skinYCenter) && !ignoreCenter) ? this.skinYCenter+yC : yC;
+        }        
+       
+        var response = this.testPropertyValues(presetValues, ignoreConstraints);
+             
+        if (response.result) {
+		  this.skinInstance.removeClass("forbiddenPosition");
+        } else {
+		  this.skinInstance.addClass("forbiddenPosition");
         }
         
         return response; 
@@ -1572,14 +1694,7 @@ HoloComponent.prototype = {
     
 
     // Getters/setters
-    get type(){
-        return this._type;
-    },
 
-    set type(val){
-        var oldType = this._type;
-        this._type = val;
-    },
 
     get skinInstance(){
         return this._skinInstance;
@@ -1629,19 +1744,25 @@ HoloComponent.prototype = {
                 this.skinInstance.draggable({
                     zIndex: 100000,
                     containment: $(".mainCanvas"),
-/*					drag: function(event, ui) {
+					drag: function(event, ui) {
                         var c = window.holoComponentManager.getComponentById(this.id);
-                        c.moveTo(this.getX, this.getY);
+                        c.testMoveTo(this.getX, this.getY);
                     },
                     start: function(event, ui){
-                    },*/
+                    },
+                    start: function(event, ui) {
+                        var me = $(this);
+                        me.data("originalPos", me.position());
+                    },
                     stop: function(event, ui){
                         window.holoComponentManager.operationManager.recordOperation("Move component"); 
 
                         var c = window.holoComponentManager.getComponentById(this.id);
-                        c.moveTo(c.getX(), c.getY());
+                        var response = c.moveTo(c.getX(), c.getY());
 
-                        window.holoComponentManager.operationManager.finishRecording(true);
+                        $(this).removeClass("forbiddenPosition");
+
+                        window.holoComponentManager.operationManager.finishRecording(response.result);
                     },
                     
                 }).addTouch();
@@ -1729,15 +1850,23 @@ Constraints.prototype = {
 
     checkOn: function(target){
         var result;
+        var response;
         if (this.list){
             var stop = false;
             for (var i = 0; i < this.list.length && (stop !== true); i++){
                 eval(this.list[i]);
-                result = __constraint__.call(target);
-                if (result) stop = result.response;
+                response = __constraint__.call(target);
+                if (response) stop = response.result;
             }
         }
-        return (isSet(result)) ? result: new Response(true);
+        if (isSet(response)) {
+            if (window.showMessage && isSet(response.code)) {
+                window.showMessage(response.toString());
+            }
+            return response;
+        } else {
+            return new Response(true);
+        }
     },
 }
 
@@ -1810,8 +1939,10 @@ OperationManager.prototype = {
     finishRecording: function(logRecorded){
         if (logRecorded == true){
             this.log(this.beingRecordedOperation);
+            trace("LOGGING");
         } else {
             this.beingRecordedOperation.rollBack();
+            trace("ROLLING BACK");
         }
 
         trace($.toJSON(this.beingRecordedOperation));

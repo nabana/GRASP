@@ -3,7 +3,7 @@
         Some description of this library. Some description of this library. Some description of this library. Some description of this library.
     </description>
 	<dictionary>
-		<term id="SET_SIZE_EXCEEDED">Set size exceeded.</term>		
+		<term id="SET_SIZE_EXCEEDED">Set size exceeded.</term>
 	</dictionary>
     <quantities>
         <quantity id="ForceMagnitude" symbol="F">
@@ -55,11 +55,24 @@
             <description>
                 This is the component that represents a two-dimensional force vector.
             </description>
+        	<dictionary>
+        		<term id="WRONG_PLACE">This component can't really go there.</term>        
+        	</dictionary>
         	<onCreation><![CDATA[
 				if (!this.isDummy) {
 					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
 				}
-			]]></onCreation>		
+			]]></onCreation>
+            <constraints>
+                <constraint><![CDATA[
+                    if (this.presetPropertyValues['positionX'] != undefined && this.presetPropertyValues['positionY'] != undefined) {
+                       if (this.presetPropertyValues['positionX'] > 200 || this.presetPropertyValues['positionY'] > 200 ) {
+                            trace("Wrong position");
+                            return new Response(false, "WRONG_PLACE", this);
+                       }
+                    }
+                ]]></constraint>
+            </constraints>             
             <properties>
 				<variable id="symbol" label="Symbol" defaultValue="V">
 					<description>
@@ -75,11 +88,6 @@
                     <description>
                         Numerical value of the vector
                     </description>
-                    <validRanges>
-                        <range type="CLOSED_RANGE" label="Positive or zero">
-                            0,*
-                        </range>
-                    </validRanges>
                 </variable>
                 <group id="visualProperties" label="Visual properties">
                 	<members>
@@ -97,6 +105,15 @@
 		                    <description>
 		                        Rotation
 		                    </description>
+                        	<dictionary>
+                	        	<term id="WRONG_DIRECTION">Wrong direction.</term>
+                        	</dictionary>                            
+							<constraints>
+								<constraint><![CDATA[
+									if (this.presetValue<0) 
+    									return new Response(false, "WRONG_DIRECTION", this);
+								]]></constraint>
+							</constraints>                            
 		                </variable>
 					</members>
 				</group>
@@ -131,11 +148,6 @@
                     <description>
                         Direction of the moment
                     </description>
-                    <validRanges>
-                        <range type="ENUM" label="clockwise or counter-clockwise">
-                            -1:"ccw",1:"cw"
-                        </range>
-                    </validRanges>
                 </variable>
                 <group id="visualProperties" label="Visual properties">
 					<members>

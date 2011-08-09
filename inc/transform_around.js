@@ -227,11 +227,14 @@ jQuery.fn.extend({
                     var target = $(this);
                     window.beingRotated = target;
                     e.stopPropagation();
-                    trace("Rotation started...");
+                    //trace("Rotation started...");
 
 			        var rotateStart = target.data("rotateStart"); 
 			        if (rotateStart) {
-			            rotateStart.call(target.data("host"), target.data("host").css("rotate"));
+                        host = target.data("host");
+                        var angle =  host.css("rotate");
+                        target.data("startAngle", angle);
+			            rotateStart.call(host, angle);
 			        }
                     
                 },
@@ -551,10 +554,13 @@ $(document).mousemove(function(e){
 			var oldAngle = wrapper.data("host").css('rotate');
 	        var rotateChange = target.data("rotateChange"); 
 	        if (rotateChange) {
-	            if (rotateChange.call(host, oldAngle, newAngle)) host.rotate(newAngle); 
-	        } else {
-			    host.rotate(newAngle);
-            }
+	            if (rotateChange.call(host, oldAngle, newAngle)) {
+                    host.removeClass("forbiddenRotationAngle");
+                } else {
+                    host.addClass("forbiddenRotationAngle");
+                }
+	        } 
+			host.rotate(newAngle);
 		}
 		
 	} else if (target = window.beingResized) {
@@ -598,13 +604,16 @@ $(document).mousemove(function(e){
 $(document).mouseup(function(e){
     var target;
     if (target = window.beingRotated) {
-        trace("Rotation ended...");
-        
+        //trace("Rotation ended...");
+        var host = target.data("host");
 		var rotateStop = target.data("rotateStop"); 
         if (rotateStop) {
-            rotateStop.call(target.data("host"), target.data("host").css("rotate"));
+            var res = rotateStop.call(target.data("host"), host.css("rotate"));
+            if (!res) {
+                host.rotate(target.data("startAngle"));
+            }
         }
-		
+    	host.removeClass("forbiddenRotationAngle");	
         window.beingRotated = null;
     } else if(target = window.beingResized) {
         trace("Resize ended...");

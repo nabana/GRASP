@@ -432,3 +432,16 @@ div.clock {
 	border-collapse: collapse;
 	margin: -1px;
 }
+
+.forbiddenRotationAngle {
+    border: 1px solid gray !important;
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=35)"; 
+	filter: alpha(opacity=35);
+	opacity: .35;	    
+}
+
+.forbiddenPosition {
+	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=35)"; 
+	filter: alpha(opacity=35);
+	opacity: .35;	    
+}

@@ -1,8 +1,8 @@
 <script>	
 	__host__.on_addTo = function(){ 
 		trace("Vector skin attached to ["+this.id+"]");
-        this.skinInstance.xCenter = 3;
-        this.skinInstance.yCenter = 10;
+        this.skinXCenter = 3;
+        this.skinYCenter = 10;
 
         // setting up skinAttributes
         this.skinAttributes = {
@@ -10,13 +10,15 @@
             vectorRotation: {
                 setValue: function (value) {
                     // context is host
-                    trace("***************************************************** "+value);
+                    //trace("***************************************************** "+value);
                     if (this.skinParts.arrowCanvas) this.skinParts.arrowCanvas.rotate(value);
-
+                    
+                    $fbd.positionVectorLabel.call(this, value);
+			    
                 },
 
                 getValue: function() {
-                    if (this.skinParts.arrowCanvas) return this.skinParts.arrowCanvas.rotate();
+                    if (this.skinParts.arrowCanvas) return this.skinParts.arrowCanvas.css('rotate');
                 }
 
             }
@@ -51,6 +53,7 @@
         this.skinParts = {};
 
         this.skinParts.arrowCanvas = arrowCanvas;
+        this.skinParts.label = label;
 	};
 	
 	__host__.drawEllipse = function() {
@@ -97,43 +100,48 @@
 	
 	__host__.onSelect = function () {
 		
-        var arrowCanvas = this.skinInstance.find('[id="arrowCanvas"]');
-        var label = this.skinInstance.find('[id="label"]');	
-			
+        var arrowCanvas = this.skinParts.arrowCanvas;
+        var label = this.skinParts.label;	
+		var c = this;	
+
         arrowCanvas.attachRotateControl({
             color: "orange",
-			rotateChange: function (oldangle, angle) {
-				if (angle > 180 || angle < 0) {
-				    label.css("top", 20);	
-				} else {
-                    label.css("top", -20);
-				}
-			    
-                var c = this.data("hostComponent");
+            rotateStart: function(angle) {
+            },
+            
+            rotateStop: function(angle) {
+        //        var c = this.data("hostComponent");
 
-                var bindedProperty = c.skinAttributeBindingsToProperties['vectorRotation'];
+                var bindedPropertyId = c.skinAttributeBindingsToProperties['vectorRotation'];
 
-                if (bindedProperty) {
-                    trace("bindedProperty");
-                    window.holoComponentManager.operationManager.recordOperation("Rotate component"); 
-
-                    c.ignoreBindings = true; 
+                if (bindedPropertyId) {
                     try {
-                        var response = c.setPropertyValue(bindedProperty, c.skinAttributes['vectorRotation'].getValue(), false);
-                        trace("ITT!!!!!!");
+                        window.holoComponentManager.operationManager.recordOperation("Rotate component"); 
+
+                        c.ignoreBindings = true; 
+                        //trace(c.skinAttributes['vectorRotation'].getValue.call(c));
+
+                        var response = c.setPropertyValue(bindedPropertyId, c.skinAttributes['vectorRotation'].getValue.call(c), false);
+                        window.holoComponentManager.operationManager.finishRecording(response.result);                        
                     } catch(e) {
                         var response = new Response(false);
                     }
+
                     c.ignoreBindings = false;
-
-                    window.holoComponentManager.operationManager.finishRecording(response.result);
-
                     return response.result;
                 } else {
                     return true;
                 }
 
-                return true;
+            },
+            
+			rotateChange: function (oldangle, angle) {
+                $fbd.positionVectorLabel.call(c, angle);
+                var bindedPropertyId = c.skinAttributeBindingsToProperties['vectorRotation'];
+                
+                var respond = c.testPropertyValue(bindedPropertyId, c.skinAttributes['vectorRotation'].getValue.call(c));
+
+                return respond.result;
 			},
 
         });

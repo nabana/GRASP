@@ -175,6 +175,11 @@ function GRASPPlayer(initObj){
       }
 
 
+    window.showMessage = function (message) {
+        // will have to be finished
+        trace("MESSAGE: "+message);        
+    }
+
     this.libraryManager = new GRASPLibraryManager();
 
     trace("GRASPPlayer " + this.version + " created.");
@@ -466,7 +471,7 @@ GRASPPlayer.prototype = {
 
     setSelection: function(ids, addToExistingSelection){
 
-        if (addToExistingSelection !== true && window.player.selectedComponents && window.player.selectedComponents.length && window.player.selectedComponents.indexOf(c) == -1){
+        if (addToExistingSelection !== true && window.player.selectedComponents && window.player.selectedComponents.length){
             this.clearSelection();
         }
         
