@@ -64,14 +64,13 @@
 				}
 			]]></onCreation>
             <constraints>
-                <constraint><![CDATA[
-                    if (this.presetPropertyValues['positionX'] != undefined && this.presetPropertyValues['positionY'] != undefined) {
-                       if (this.presetPropertyValues['positionX'] > 200 || this.presetPropertyValues['positionY'] > 200 ) {
-                            trace("Wrong position");
-                            return new Response(false, "WRONG_PLACE", this);
-                       }
-                    }
-                ]]></constraint>
+                <!-- <constraint><![CDATA[ -->
+                <!--     if (this.presetPropertyValues['positionX'] != undefined && this.presetPropertyValues['positionY'] != undefined) { -->
+                <!--        if (this.presetPropertyValues['positionX'] > 200 || this.presetPropertyValues['positionY'] > 200 ) { -->
+                <!--             return new Response(false, "WRONG_PLACE", this); -->
+                <!--        } -->
+                <!--     } -->
+                <!-- ]]></constraint> -->
             </constraints>             
             <properties>
 				<variable id="symbol" label="Symbol" defaultValue="V">
@@ -109,10 +108,9 @@
                 	        	<term id="WRONG_DIRECTION">Wrong direction.</term>
                         	</dictionary>                            
 							<constraints>
-								<constraint><![CDATA[
-									if (this.presetValue<0) 
-    									return new Response(false, "WRONG_DIRECTION", this);
-								]]></constraint>
+								<!-- <constraint><![CDATA[ -->
+								<!-- 	// if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
+								<!-- ]]></constraint> -->
 							</constraints>                            
 		                </variable>
 					</members>

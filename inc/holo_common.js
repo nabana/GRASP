@@ -431,6 +431,17 @@ PropertyInstance.prototype = {
         }
     },
 
+    tryValue: function(presetValue){
+        this.presetValue = presetValue;
+        var testResponse = null;
+        testResponse = this.testPresetValue();
+        if (testResponse.result === true){
+            return new Response(true);
+        } else{
+            return testResponse;
+        }
+    },
+
     destruct: function(){
         if (window.holoComponentManager.propertyManager){
             window.holoComponentManager.propertyManager.unregisterProperty(this);
@@ -1312,8 +1323,7 @@ HoloComponent.prototype = {
         var testResponse = this.testPresetPropertyValues();
 
         if (testResponse.result === true){
-             var response2 = this.usePresetProperyValues();
-             delete this.presetPropertyValues[propertyId];
+             var response2 = this.tryToUsePresetProperyValues();
              return response2;
         } else{
            
@@ -1335,7 +1345,7 @@ HoloComponent.prototype = {
                 var createResponse = this.createProperty(propertyId);
                 if (!createResponse.result){
 
-                    this.presetPropertyValues = null;
+                    this.presetPropertyValues = {};
                     return createResponse;
                 }
             }
@@ -1346,14 +1356,14 @@ HoloComponent.prototype = {
 
             var testResponse = this.testPresetPropertyValues();
             if (testResponse.result === true){
-                this.usePresetProperyValues();
+                var response2 = this.usePresetProperyValues();
 
-                this.presetPropertyValues = null;
+                this.presetPropertyValues = {};
 
-                return new Response(true);
+                return response2;
             }
             else{
-                this.presetPropertyValues = null;
+                this.presetPropertyValues = {};
 
                 return testResponse;
             }
@@ -1377,7 +1387,7 @@ HoloComponent.prototype = {
                 var createResponse = this.createProperty(propertyId);
                 if (!createResponse.result){
 
-                    this.presetPropertyValues = null;
+                    this.presetPropertyValues = {};
                     return createResponse;
                 }
             }
@@ -1387,12 +1397,13 @@ HoloComponent.prototype = {
 
        var testResponse = this.testPresetPropertyValues(); // HERE
        if (testResponse.result === true){
+            var response2 = this.tryToUsePresetProperyValues();
 
-            this.presetPropertyValues = null;
+            this.presetPropertyValues = {};
 
-            return new Response(true);
+            return response2;
        } else {
-            this.presetPropertyValues = null;
+            this.presetPropertyValues = {};
             return testResponse;
         }
         
@@ -1403,6 +1414,28 @@ HoloComponent.prototype = {
 
     testPresetPropertyValues: function(){
         return this.type.constraints.checkOn(this);
+    },
+
+    tryToUsePresetProperyValues: function(){
+        this._oldPropertyValues = {};
+
+        var changedPropertyIds = [];
+
+        for (var key in this.presetPropertyValues){
+            this._oldPropertyValues[key] = this.getPropertyValue(key);
+            var property = this.getProperty(key);
+
+            changedPropertyIds.push(property.id);
+            var response = property.tryValue(this.presetPropertyValues[key]);
+            if (response.result == false){
+                this.presetPropertyValues = {};                
+                return response;
+            }
+        }
+
+        this.presetPropertyValues = {};
+        this.dispatchEvent("PROPERTYVALUES_CHANGED", this.id, changedPropertyIds);
+        return response;        
     },
 
     usePresetProperyValues: function(){
@@ -1635,12 +1668,12 @@ HoloComponent.prototype = {
       
     },
     
-    testMoveTo: function(xC, yC, ignoreConstraints, ignoreCenter) {
+    testMoveTo: function(xC, yC) {
       
       if (this.skinInstance) {
         
         var presetValues = {};
-        
+        var ignoreCenter = false;
         
         if (!this.isDummy && isSet(this.type.propertyBindingsToSkinAttributes["positionX"])) {
           presetValues[this.type.propertyBindingsToSkinAttributes["positionX"]] = (isSet(this.skinXCenter) && !ignoreCenter) ? this.skinXCenter+xC : xC; 
@@ -1649,8 +1682,8 @@ HoloComponent.prototype = {
         if (!this.isDummy && isSet(this.type.propertyBindingsToSkinAttributes["positionY"])) {
           presetValues[this.type.propertyBindingsToSkinAttributes["positionY"]] = (isSet(this.skinYCenter) && !ignoreCenter) ? this.skinYCenter+yC : yC;
         }        
-       
-        var response = this.testPropertyValues(presetValues, ignoreConstraints);
+
+        var response = this.testPropertyValues(presetValues, false);
              
         if (response.result) {
 		  this.skinInstance.removeClass("forbiddenPosition");
@@ -1746,7 +1779,7 @@ HoloComponent.prototype = {
                     containment: $(".mainCanvas"),
 					drag: function(event, ui) {
                         var c = window.holoComponentManager.getComponentById(this.id);
-                        c.testMoveTo(this.getX, this.getY);
+                        c.testMoveTo(c.getX(), c.getY());
                     },
                     start: function(event, ui){
                     },
@@ -1860,8 +1893,8 @@ Constraints.prototype = {
             }
         }
         if (isSet(response)) {
-            if (window.showMessage && isSet(response.code)) {
-                window.showMessage(response.toString());
+            if (isSet(response.code)) {
+                window.holoComponentManager.showMessage(response.toString());
             }
             return response;
         } else {

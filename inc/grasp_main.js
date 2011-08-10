@@ -174,12 +174,6 @@ function GRASPPlayer(initObj){
         window.operationManager.registerAction("ComponentDeselection", ComponentDeselection);
       }
 
-
-    window.showMessage = function (message) {
-        // will have to be finished
-        trace("MESSAGE: "+message);        
-    }
-
     this.libraryManager = new GRASPLibraryManager();
 
     trace("GRASPPlayer " + this.version + " created.");
@@ -212,7 +206,7 @@ GRASPPlayer.prototype = {
 
 
     showMessage: function(msg){
-        trace(msg);
+//        trace(msg);
     },
 
     parseDiagramDescriptor: function(xml){
