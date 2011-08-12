@@ -1489,6 +1489,34 @@ HoloComponent.prototype = {
         
     },
 
+    setPropertyValuesForSkinAttributesInOperation: function(skinAttributeIds, operationId) {
+        var presetValues = {};
+
+        for (var i=0; i<skinAttributeIds.length; i++) {
+            var skinAttributeId = skinAttributeIds[i];
+            var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributeId];
+            if (bindedPropertyId) {
+                presetValues[bindedPropertyId] =  this.skinAttributes[skinAttributeId].getValue.call(this);
+            } 
+        }
+
+        try {
+            window.holoComponentManager.operationManager.recordOperation(operationId); 
+
+            this.ignoreBindings = true; 
+
+            var response = this.setPropertyValues(presetValues, false);
+            window.holoComponentManager.operationManager.finishRecording(response.result);                        
+        } catch(e) {
+            var response = new Response(false);
+        }
+
+        this.ignoreBindings = false;
+
+        return response;
+        
+    },
+
     testPropertyValueForSkinAttribute: function(skinAttributeId) {
         var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributeId];
 
@@ -1499,8 +1527,22 @@ HoloComponent.prototype = {
         }
     },
 
+    testPropertyValuesForSkinAttributes: function(skinAttributeIds) {
+        var presetValues = {};
+        
+        for (var i=0; i<skinAttributeIds.length; i++) {
+            var skinAttributeId = skinAttributeIds[i];
+            var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributeId];
+            if (bindedPropertyId) {
+                presetValues[bindedPropertyId] =  this.skinAttributes[skinAttributeId].getValue.call(this);
+            } 
+        }
+
+        return this.testPropertyValues(presetValues);
+    },
+
     getPropertyValueForSkinAttribue: function(skinAttributeId) {
-         var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributId];
+        var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributId];
 
         if (bindedPropertyId) {
            this.getPropertyValue(bindedPropertyId);
@@ -1736,7 +1778,7 @@ HoloComponent.prototype = {
           presetValues[this.type.propertyBindingsToSkinAttributes["positionY"]] = (isSet(this.skinYCenter) && !ignoreCenter) ? this.skinYCenter+yC : yC;
         }        
 
-        var response = this.testPropertyValues(presetValues, false);
+        var response = this.testPropertyValues(presetValues);
              
         if (response.result) {
             if (this.skinInstance.data('forbiddenPosition')) {
@@ -1907,7 +1949,7 @@ Dictionary.prototype = {
 
     translate: function(term_id){
         if (isSet(this.terms[term_id])){
-            return this.terms[term_id];
+            return this.terms[term_id]; // HERE
         } else if (player._library.dictionary && isSet(player._library.dictionary.terms[term_id])){
             return player._library.dictionary.terms[term_id];
         } else{

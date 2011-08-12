@@ -63,15 +63,22 @@
 					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
 				}
 			]]></onCreation>
-            <!-- <constraints> -->
-            <!--     <constraint><![CDATA[ -->
-            <!--         if (this.presetPropertyValues['CenterX'] != undefined && this.presetPropertyValues['CenterY'] != undefined) { -->
-            <!--            if (this.presetPropertyValues['CenterX'] > 200 || this.presetPropertyValues['CenterY'] > 200 ) { -->
-            <!--                 return new Response(false, "WRONG_PLACE", this); -->
-            <!--            } -->
-            <!--         } -->
-            <!--     ]]></constraint> -->
-            <!-- </constraints>              -->
+            <constraints>
+                <constraint><![CDATA[
+                    if (this.presetPropertyValues['CenterX'] != undefined && this.presetPropertyValues['CenterY'] != undefined) {
+                       if (this.presetPropertyValues['CenterX'] > 200 || this.presetPropertyValues['CenterY'] > 200 ) {
+                            return new Response(false, "WRONG_PLACE", this);
+                       }
+                    }
+                ]]></constraint>
+                <constraint><![CDATA[
+                    if (this.presetPropertyValues['MajorAxis'] != undefined && this.presetPropertyValues['MinorAxis'] != undefined) {
+                       if (this.presetPropertyValues['MajorAxis'] < 20 || this.presetPropertyValues['MinorAxis'] < 20 ) {
+                            return new Response(false, "WRONG_ELLIPSE_SIZE", this);
+                       }
+                    }
+                ]]></constraint>
+            </constraints>
             <properties>
 				<variable id="symbol" label="Symbol" defaultValue="V">
 					<description>
@@ -117,12 +124,22 @@
 		                        Y coordinate
 		                    </description>
 		                </variable>
+						<variable id="MajorAxis" label="X" controlType="TF_INT" controlParameters="0,0,4" bindToSkinAttribute="ellipseWidth" defaultValue="60">
+		                    <description>
+		                        Major Axis
+		                    </description>
+		                </variable>
+		                <variable id="MinorAxis" label="Y" controlType="TF_INT" controlParameters="70,0,4" bindToSkinAttribute="ellipseHeight" defaultValue="60">
+		                    <description>
+		                        Minor Axis
+		                    </description>
+		                </variable>
 		                <variable id="Rotation" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="ellipseRotation"  defaultValue="90">
 							<!-- <constraints> -->
 							<!-- 	<constraint><![CDATA[ -->
 							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
 							<!-- 	]]></constraint> -->
-							<!-- </constraints>                             -->
+							<!-- </constraints>-->
                         </variable>
 					</members>
 				</group>                

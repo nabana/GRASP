@@ -228,12 +228,12 @@ jQuery.fn.extend({
                     window.beingRotated = target;
                     e.stopPropagation();
                     //trace("Rotation started...");
+                    host = target.data("host");
+                    var angle =  host.css("rotate");
+                    target.data("startAngle", angle);
 
 			        var rotateStart = target.data("rotateStart"); 
 			        if (rotateStart) {
-                        host = target.data("host");
-                        var angle =  host.css("rotate");
-                        target.data("startAngle", angle);
 			            rotateStart.call(host, angle);
 			        }
                     
@@ -352,6 +352,7 @@ jQuery.fn.extend({
             var resizeControlKnob0 = $("<canvas/>", {
                 "title": "Grab to resize",
                 "style": "position:absolute; cursor: crosshair;",
+                
             });
 			
             resizeControlKnob0[0].height = knobSize;
@@ -426,11 +427,16 @@ jQuery.fn.extend({
                     window.beingResized = target;
                     e.stopPropagation();
 					window.resizeMouseOldPosition = [e.pageX, e.pageY];
-                    trace("Resize started...");
-                    if (target.resizeStart) {
-                        target.resizeStart.call();
-                    }
-                    
+                    //trace("Resize started...");
+
+                    host = target.data("host");
+                    var size = {width: host.width(), height: host.height()};
+                    host.data("startSize", size);
+
+			        var resizeStart = target.data("resizeStart"); 
+			        if (resizeStart) {
+			            resizeStart.call(host, size);
+			        }
              };
 			 
             resizeControlKnob0.bind('mousedown', on_mouseDown);
@@ -599,10 +605,27 @@ $(document).mousemove(function(e){
 		mX_ = sign[0]*mX_;
 		mY_ = sign[1]*mY_;
         var host = wrapper.data("host"); 
-		var newWidth = host.width()+mX_;
-		var newHeight = host.height()+mY_;
+        var oldSize = {width: host.width(), height: host.height()};
+		//var newWidth = host.width()+mX_;
+		//var newHeight = host.height()+mY_;
+        var newSize = {width: oldSize.width+mX_, height: oldSize.height+mY_};
 		//trace(newWidth+" "+newHeight);
-		host.resize(newWidth, newHeight);
+        var resizeChange = target.data("resizeChange"); 
+        if (resizeChange) {
+            if (resizeChange.call(host, oldSize, newSize)) {
+                if (host.data("forbiddenSize")) {
+                    host.data("forbiddenSize", false);
+                    host.removeClass("forbiddenSize");
+                }
+            } else {
+                if (host.data("forbiddenSize")!==true) {
+                    host.data("forbiddenSize", true);
+                    host.addClass("forbiddenSize");
+                }
+            }
+        } 
+
+		host.resize(newSize.width, newSize.height);
 		window.resizeMouseOldPosition = [e.pageX, e.pageY];
 	}
 });
@@ -614,18 +637,35 @@ $(document).mouseup(function(e){
         var host = target.data("host");
 		var rotateStop = target.data("rotateStop"); 
         if (rotateStop) {
-            var res = rotateStop.call(target.data("host"), host.css("rotate"));
+            var res = rotateStop.call(host, host.css("rotate"));
             if (!res) {
                 host.rotate(target.data("startAngle"));
             }
         }
-    	host.removeClass("forbiddenRotationAngle");	
+
+        if (host.data("forbiddenAngle")) {
+            host.data("forbiddenAngle", false);
+            host.removeClass("forbiddenRotationAngle");
+        }
+
         window.beingRotated = null;
     } else if(target = window.beingResized) {
-        trace("Resize ended...");
-        if (target.resizeStop) {
-            target.resizeStop.call();
+        //trace("Resize ended...");
+        var host = target.data("host");
+        var resizeStop = target.data("resizeStop");
+        if (resizeStop) {
+            var res = resizeStop.call(host, []);
+            if (!res) {
+                var startSize = host.data("startSize");
+                host.resize(startSize.width, startSize.height); 
+            }
         }
+
+        if (host.data("forbiddenSize")) {
+            host.data("forbiddenSize", false);
+            host.removeClass("forbiddenSize");
+        }
+        
         window.beingResized = null;		
 	}     
 });

@@ -31,7 +31,35 @@
 
                     if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.css('rotate');
                 }
-            }            
+            },
+
+            ellipseWidth: {
+                setValue: function (value) {
+                    if (this.skinParts.ellipseCanvas) {
+                        this.skinParts.ellipseCanvas.resize(value, this.skinParts.ellipseCanvas.height());
+                    }
+                },
+
+                getValue: function() {
+//                    trace("***************************************************** "+this.skinParts.ellipseCanvas.css('rotate'));
+
+                    if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.width();
+                }
+            },
+
+            ellipseHeight: {
+                setValue: function (value) {
+                    if (this.skinParts.ellipseCanvas) {
+                        this.skinParts.ellipseCanvas.resize(this.skinParts.ellipseCanvas.width(), value);
+                    }
+                },
+
+                getValue: function() {
+//                    trace("***************************************************** "+this.skinParts.ellipseCanvas.css('rotate'));
+
+                    if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.height();
+                }
+            }   
 
         }
 	};
@@ -115,6 +143,15 @@
         ellipseCanvas.attachResizeControl({
             color: "blue",
 
+            resizeStop: function(angle) {
+                var respond = c.setPropertyValuesForSkinAttributesInOperation(['ellipseWidth', 'ellipseHeight'], 'Rotate Vector');
+                return respond.result;
+            },
+            
+			resizeChange: function (oldangle, angle) {
+                var respond = c.testPropertyValuesForSkinAttributes(['ellipseWidth', 'ellipseHeight']);
+                return respond.result;
+			},
             
         });
         
@@ -122,6 +159,8 @@
         this.skinParts.ellipseCanvas = ellipseCanvas;
 
         this.refreshSkinAttribute('ellipseRotation');
+        this.refreshSkinAttribute('ellipseWidth');
+        this.refreshSkinAttribute('ellipseHeight');
 	};
 	
 	
