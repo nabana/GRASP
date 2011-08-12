@@ -555,9 +555,15 @@ $(document).mousemove(function(e){
 	        var rotateChange = target.data("rotateChange"); 
 	        if (rotateChange) {
 	            if (rotateChange.call(host, oldAngle, newAngle)) {
-                    host.removeClass("forbiddenRotationAngle");
+                    if (host.data("forbiddenAngle")) {
+                        host.data("forbiddenAngle", false);
+                        host.removeClass("forbiddenRotationAngle");
+                    }
                 } else {
-                    host.addClass("forbiddenRotationAngle");
+                    if (host.data("forbiddenAngle")!==true) {
+                        host.data("forbiddenAngle", true);
+                        host.addClass("forbiddenRotationAngle");
+                    }
                 }
 	        } 
 			host.rotate(newAngle);

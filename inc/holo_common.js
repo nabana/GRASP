@@ -652,7 +652,7 @@ VariableType.prototype = {
     valueType: null,
 }
 
-$.extend(VariableType.prototype, new PropertyType());
+$.extend(VariableType.prototype, PropertyType.prototype);
 
 VariableType.prototype.initFromJSONObj = function(jsonObj){
     PropertyType.prototype.initFromJSONObj.call(this, jsonObj);
@@ -1466,9 +1466,62 @@ HoloComponent.prototype = {
         return response;        
     },
 
+    setPropertyValueForSkinAttributeInOperation: function(skinAttributId, operationId) {
+        var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributId];
+
+        if (bindedPropertyId) {
+            try {
+                window.holoComponentManager.operationManager.recordOperation(operationId); 
+
+                this.ignoreBindings = true; 
+
+                var response = this.setPropertyValue(bindedPropertyId, this.skinAttributes[skinAttributId].getValue.call(this), false);
+                window.holoComponentManager.operationManager.finishRecording(response.result);                        
+            } catch(e) {
+                var response = new Response(false);
+            }
+
+            this.ignoreBindings = false;
+            return response;
+        } else {
+            return new Response(true);
+        }
+        
+    },
+
+    testPropertyValueForSkinAttribute: function(skinAttributeId) {
+        var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributeId];
+
+        if (bindedPropertyId) {
+            return this.testPropertyValue(bindedPropertyId, this.skinAttributes[skinAttributeId].getValue.call(this));
+        } else {
+            return new Response(true);
+        }
+    },
+
+    getPropertyValueForSkinAttribue: function(skinAttributeId) {
+         var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributId];
+
+        if (bindedPropertyId) {
+           this.getPropertyValue(bindedPropertyId);
+        } else {
+            return undefined;
+        }
+
+    },
+
+    refreshSkinAttribute: function(skinAttribute) {
+        var attributeDescriptor = this.skinAttributes[skinAttribute];
+
+        if (attributeDescriptor && $.isFunction(attributeDescriptor.setValue)) {
+            attributeDescriptor.setValue.call(this, this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+        }
+
+    },
+
     deleteProperty: function(propertyId){
 
-        },
+    },
 
     getChild: function(id){
         var index = this._childComponentIndexForId = this._childComponentIndexForId || {};
@@ -1686,9 +1739,15 @@ HoloComponent.prototype = {
         var response = this.testPropertyValues(presetValues, false);
              
         if (response.result) {
-		  this.skinInstance.removeClass("forbiddenPosition");
+            if (this.skinInstance.data('forbiddenPosition')) {
+    		    this.skinInstance.removeClass("forbiddenPosition");
+                this.skinInstance.data('forbiddenPosition', false);
+            }
         } else {
-		  this.skinInstance.addClass("forbiddenPosition");
+            if (this.skinInstance.data('forbiddenPosition') != true) {
+                this.skinInstance.addClass("forbiddenPosition");
+                this.skinInstance.data('forbiddenPosition', true);
+            }
         }
         
         return response; 

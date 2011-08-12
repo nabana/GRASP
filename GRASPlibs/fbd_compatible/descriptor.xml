@@ -63,15 +63,15 @@
 					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
 				}
 			]]></onCreation>
-            <constraints>
-                <!-- <constraint><![CDATA[ -->
-                <!--     if (this.presetPropertyValues['positionX'] != undefined && this.presetPropertyValues['positionY'] != undefined) { -->
-                <!--        if (this.presetPropertyValues['positionX'] > 200 || this.presetPropertyValues['positionY'] > 200 ) { -->
-                <!--             return new Response(false, "WRONG_PLACE", this); -->
-                <!--        } -->
-                <!--     } -->
-                <!-- ]]></constraint> -->
-            </constraints>             
+            <!-- <constraints> -->
+            <!--     <constraint><![CDATA[ -->
+            <!--         if (this.presetPropertyValues['CenterX'] != undefined && this.presetPropertyValues['CenterY'] != undefined) { -->
+            <!--            if (this.presetPropertyValues['CenterX'] > 200 || this.presetPropertyValues['CenterY'] > 200 ) { -->
+            <!--                 return new Response(false, "WRONG_PLACE", this); -->
+            <!--            } -->
+            <!--         } -->
+            <!--     ]]></constraint> -->
+            <!-- </constraints>              -->
             <properties>
 				<variable id="symbol" label="Symbol" defaultValue="V">
 					<description>
@@ -90,31 +90,42 @@
                 </variable>
                 <group id="visualProperties" label="Visual properties">
                 	<members>
-						<variable id="positionX" label="X" controlType="TF_INT" controlParameters="0,0,4" bindToSkinAttribute="positionX" defaultValue="0">
-		                    <description>
-		                        X coordinate
-		                    </description>
-		                </variable>
-		                <variable id="positionY" label="Y" controlType="TF_INT" controlParameters="70,0,4" bindToSkinAttribute="positionY" defaultValue="0">
-		                    <description>
-		                        Y coordinate
-		                    </description>
-		                </variable>
-		                <variable id="rotation" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="vectorRotation"  defaultValue="90">
+		                <variable id="Direction" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="vectorRotation"  defaultValue="0">
 		                    <description>
 		                        Rotation
 		                    </description>
                         	<dictionary>
                 	        	<term id="WRONG_DIRECTION">Wrong direction.</term>
                         	</dictionary>                            
-							<constraints>
-								<!-- <constraint><![CDATA[ -->
-								<!-- 	// if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
-								<!-- ]]></constraint> -->
-							</constraints>                            
+							<!-- <constraints> -->
+							<!-- 	<constraint><![CDATA[ -->
+							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
+							<!-- 	]]></constraint> -->
+							<!-- </constraints>-->
 		                </variable>
 					</members>
 				</group>
+                <group id="AreaOfOrigin" label="Area of Origin">
+                	<members>
+						<variable id="CenterX" label="X" controlType="TF_INT" controlParameters="0,0,4" bindToSkinAttribute="positionX" defaultValue="0">
+		                    <description>
+		                        X coordinate
+		                    </description>
+		                </variable>
+		                <variable id="CenterY" label="Y" controlType="TF_INT" controlParameters="70,0,4" bindToSkinAttribute="positionY" defaultValue="0">
+		                    <description>
+		                        Y coordinate
+		                    </description>
+		                </variable>
+		                <variable id="Rotation" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="ellipseRotation"  defaultValue="90">
+							<!-- <constraints> -->
+							<!-- 	<constraint><![CDATA[ -->
+							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
+							<!-- 	]]></constraint> -->
+							<!-- </constraints>                             -->
+                        </variable>
+					</members>
+				</group>                
 				<group id="controlProperties">
 					<members>
 						<variable id="draggable" defaultValue="true"/>

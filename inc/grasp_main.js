@@ -206,7 +206,7 @@ GRASPPlayer.prototype = {
 
 
     showMessage: function(msg){
-//        trace(msg);
+        trace(msg);
     },
 
     parseDiagramDescriptor: function(xml){

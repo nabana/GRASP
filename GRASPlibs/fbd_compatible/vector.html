@@ -10,7 +10,6 @@
             vectorRotation: {
                 setValue: function (value) {
                     // context is host
-                    //trace("***************************************************** "+value);
                     if (this.skinParts.arrowCanvas) this.skinParts.arrowCanvas.rotate(value);
                     
                     $fbd.positionVectorLabel.call(this, value);
@@ -20,8 +19,19 @@
                 getValue: function() {
                     if (this.skinParts.arrowCanvas) return this.skinParts.arrowCanvas.css('rotate');
                 }
+            },
 
-            }
+            ellipseRotation: {
+                setValue: function (value) {
+                    if (this.skinParts.ellipseCanvas) this.skinParts.ellipseCanvas.rotate(value);
+                },
+
+                getValue: function() {
+//                    trace("***************************************************** "+this.skinParts.ellipseCanvas.css('rotate'));
+
+                    if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.css('rotate');
+                }
+            }            
 
         }
 	};
@@ -81,20 +91,37 @@
         ellipseWrapper.css("left", -maxSize/2+3);
         ellipseWrapper.css("top", -maxSize/2+10);
 
-        ellipseCanvas.rotate(0);
+        //ellipseCanvas.rotate(0);
         ellipseCanvas.resize(60,60);		
 		
         ellipseCanvas.attachRotateControl({
             color: "green",
-            orientation: "left"
-        });
+            orientation: "left",
 
+            rotateStop: function(angle) {
+                var respond = c.setPropertyValueForSkinAttributeInOperation('ellipseRotation', 'Rotate Area of Origin');
+                return respond.result;
+            },
+            
+			rotateChange: function (oldangle, angle) {
+                $fbd.positionVectorLabel.call(c, angle);
+                var respond = c.testPropertyValueForSkinAttribute('ellipseRotation');
+                return respond.result;
+			},
+            
+        });
+        
+        var c = this;
         ellipseCanvas.attachResizeControl({
-            color: "blue"
+            color: "blue",
+
+            
         });
         
         // registerng as skinpart
         this.skinParts.ellipseCanvas = ellipseCanvas;
+
+        this.refreshSkinAttribute('ellipseRotation');
 	};
 	
 	
@@ -110,37 +137,13 @@
             },
             
             rotateStop: function(angle) {
-        //        var c = this.data("hostComponent");
-
-                var bindedPropertyId = c.skinAttributeBindingsToProperties['vectorRotation'];
-
-                if (bindedPropertyId) {
-                    try {
-                        window.holoComponentManager.operationManager.recordOperation("Rotate component"); 
-
-                        c.ignoreBindings = true; 
-                        //trace(c.skinAttributes['vectorRotation'].getValue.call(c));
-
-                        var response = c.setPropertyValue(bindedPropertyId, c.skinAttributes['vectorRotation'].getValue.call(c), false);
-                        window.holoComponentManager.operationManager.finishRecording(response.result);                        
-                    } catch(e) {
-                        var response = new Response(false);
-                    }
-
-                    c.ignoreBindings = false;
-                    return response.result;
-                } else {
-                    return true;
-                }
-
+                var respond = c.setPropertyValueForSkinAttributeInOperation('vectorRotation', 'Rotate Vector');
+                return respond.result;
             },
             
 			rotateChange: function (oldangle, angle) {
                 $fbd.positionVectorLabel.call(c, angle);
-                var bindedPropertyId = c.skinAttributeBindingsToProperties['vectorRotation'];
-                
-                var respond = c.testPropertyValue(bindedPropertyId, c.skinAttributes['vectorRotation'].getValue.call(c));
-
+                var respond = c.testPropertyValueForSkinAttribute('vectorRotation');
                 return respond.result;
 			},
 
