@@ -41,7 +41,7 @@
                 },
 
                 getValue: function() {
-//                    trace("***************************************************** "+this.skinParts.ellipseCanvas.css('rotate'));
+//                    trace("***************************************************** "+this.skinParts.ellipseCanvas.width());
 
                     if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.width();
                 }
@@ -55,7 +55,7 @@
                 },
 
                 getValue: function() {
-//                    trace("***************************************************** "+this.skinParts.ellipseCanvas.css('rotate'));
+//                    trace("***************************************************** "+this.skinParts.ellipseCanvas.height());
 
                     if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.height();
                 }
@@ -144,7 +144,7 @@
             color: "blue",
 
             resizeStop: function(angle) {
-                var respond = c.setPropertyValuesForSkinAttributesInOperation(['ellipseWidth', 'ellipseHeight'], 'Rotate Vector');
+                var respond = c.setPropertyValuesForSkinAttributesInOperation(['ellipseWidth', 'ellipseHeight'], 'Resize Area of Origin');
                 return respond.result;
             },
             

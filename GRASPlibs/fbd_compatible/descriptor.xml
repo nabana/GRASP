@@ -81,6 +81,8 @@
                 <!--     } -->
                 <!-- ]]></constraint> -->
                 <constraint><![CDATA[
+                    trace(this.presetPropertyValues['MinorAxis']+" "+this.presetPropertyValues['MajorAxis']);
+
                     if (this.presetPropertyValues['MajorAxis'] != undefined && this.presetPropertyValues['MinorAxis'] != undefined) {
                        if (this.presetPropertyValues['MajorAxis'] < 30 || this.presetPropertyValues['MinorAxis'] < 30 ||
                            this.presetPropertyValues['MajorAxis'] > 150 || this.presetPropertyValues['MinorAxis'] > 150  ) {
@@ -165,7 +167,7 @@
                                 </parameters>
                             </widget>                            
 		                </variable>
-						<variable id="MajorAxis" quantity="Position" label="X" bindToSkinAttribute="ellipseWidth" defaultValue="60">
+						<variable id="MajorAxis" quantity="Position" label="Major Axis" bindToSkinAttribute="ellipseWidth" defaultValue="60">
 		                    <description>
 		                        Major Axis
 		                    </description>
@@ -176,18 +178,18 @@
                                 </parameters>
                             </widget>                            
 		                </variable>
-		                <variable id="MinorAxis" quantity="Position" label="Y" bindToSkinAttribute="ellipseHeight" defaultValue="60">
+						<variable id="MinorAxis" quantity="Position" label="Minor Axis" bindToSkinAttribute="ellipseHeight" defaultValue="60">
 		                    <description>
 		                        Minor Axis
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
                                     <width>140</width>
-                                    <valueType>Numeric</valueType>
                                     <afterDecimal>0</afterDecimal>
                                 </parameters>
                             </widget>                            
 		                </variable>
+                        
 		                <variable id="Rotation" quantity="Direction" label="Rot" bindToSkinAttribute="ellipseRotation"  defaultValue="90">
 							<!-- <constraints> -->
 							<!-- 	<constraint><![CDATA[ -->
@@ -202,18 +204,7 @@
                                 </parameters>
                             </widget>
                         </variable>
-		                <variable id="Type" label="Y" bindToSkinAttribute="ellipseHeight" defaultValue="60">
-		                    <description>
-		                        Minor Axis
-		                    </description>
-                            <widget type="TextField">
-                                <parameters>
-                                    <width>140</width>
-                                    <valueType>Numeric</valueType>
-                                    <afterDecimal>0</afterDecimal>
-                                </parameters>
-                            </widget>                            
-		                </variable>                        
+		                                
 					</members>
 				</group>                
 				<group id="controlProperties">

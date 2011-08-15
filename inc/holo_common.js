@@ -515,7 +515,7 @@ $.extend(PropertyGroup.prototype, new PropertyType());
 PropertyGroup.prototype.initFromJSONObj = function(jsonObj){
     PropertyType.prototype.initFromJSONObj.call(this, jsonObj);
 
-    types = initPropertyTypesFromJSONObj(jsonObj["members"][0], this.parentComponentType, this, true);
+    var types = initPropertyTypesFromJSONObj(jsonObj["members"][0], this.parentComponentType, this, true);
 
     this.members = this.members || [];
     for (var i = 0; i < types.length; i++){
@@ -685,7 +685,9 @@ VariableType.prototype.initFromJSONObj = function(jsonObj){
     
     this.parentComponentType.propertyBindingsToSkinAttributes = this.parentComponentType.propertyBindingsToSkinAttributes || {};
     
-    this.parentComponentType.propertyBindingsToSkinAttributes[this.bindToSkinAttribute] = this.id;
+    if (isSet(this.bindToSkinAttribute)) {
+        this.parentComponentType.propertyBindingsToSkinAttributes[this.bindToSkinAttribute] = this.id;
+    }
 }
 
 /*
