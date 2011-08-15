@@ -2002,11 +2002,10 @@ Constraints.prototype = {
         var result;
         var response;
         if (this.list){
-            var stop = false;
-            for (var i = 0; i < this.list.length && (stop !== true); i++){
+            for (var i = 0; i < this.list.length; i++){
                 eval(this.list[i]);
                 response = __constraint__.call(target);
-                if (response) stop = response.result;
+                if (isSet(response) && response.result === false) break;    // do not check further
             }
         }
         if (isSet(response)) {
