@@ -21,6 +21,15 @@
                 </unit>
             </units>
         </quantity>
+        <quantity id="Position" symbol="pos">
+            <units>
+                <unit id="Pixel" symbol="px" isBase="true">
+                    <factor>
+                        1
+                    </factor>
+                </unit>
+            </units>
+        </quantity>
     </quantities>
     <componentTypes>
         <componentType id="RootComponentType" skinURL="root.html" internal="true">
@@ -64,16 +73,17 @@
 				}
 			]]></onCreation>
             <constraints>
-                <constraint><![CDATA[
-                    if (this.presetPropertyValues['CenterX'] != undefined && this.presetPropertyValues['CenterY'] != undefined) {
-                       if (this.presetPropertyValues['CenterX'] > 200 || this.presetPropertyValues['CenterY'] > 200 ) {
-                            return new Response(false, "WRONG_PLACE", this);
-                       }
-                    }
-                ]]></constraint>
+                <!-- <constraint><![CDATA[ -->
+                <!--     if (this.presetPropertyValues['CenterX'] != undefined && this.presetPropertyValues['CenterY'] != undefined) { -->
+                <!--        if (this.presetPropertyValues['CenterX'] > 200 || this.presetPropertyValues['CenterY'] > 200 ) { -->
+                <!--             return new Response(false, "WRONG_PLACE", this); -->
+                <!--        } -->
+                <!--     } -->
+                <!-- ]]></constraint> -->
                 <constraint><![CDATA[
                     if (this.presetPropertyValues['MajorAxis'] != undefined && this.presetPropertyValues['MinorAxis'] != undefined) {
-                       if (this.presetPropertyValues['MajorAxis'] < 20 || this.presetPropertyValues['MinorAxis'] < 20 ) {
+                       if (this.presetPropertyValues['MajorAxis'] < 30 || this.presetPropertyValues['MinorAxis'] < 30 ||
+                           this.presetPropertyValues['MajorAxis'] > 150 || this.presetPropertyValues['MinorAxis'] > 150  ) {
                             return new Response(false, "WRONG_ELLIPSE_SIZE", this);
                        }
                     }
@@ -90,14 +100,24 @@
 						Screen ID of the component
 					</description>
 				</variable>
-                <variable id="magnitude" quantity="ForceMagnitude" label="magnitude" controlType="TF_REAL_WITH_QUANTITY">
-                    <description>
-                        Numerical value of the vector
-                    </description>
+                <variable id="MagValid" defaultValue="0"/>
+                <variable id="MagValid" defaultValue="0"/>
+                <variable id="MagnitudeFuzz" defaultValue="0"/>
+                <variable id="Magnitude" defaultValue="1"/>
+                <variable id="DirectionFuzz" defaultValue="3"/>   
+                <variable id="Type" defaultValue="N">
+                    <widget type="DropDown">
+                        <parameters>
+                            <width>100</width>
+                            <getPossibleValues><![CDATA[
+                			    return {"N": "N", "K": "K"};
+                            ]]></getPossibleValues>
+                        </parameters>
+                    </widget>
                 </variable>
                 <group id="visualProperties" label="Visual properties">
                 	<members>
-		                <variable id="Direction" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="vectorRotation"  defaultValue="0">
+		                <variable id="Direction" quantity="Direction" label="Rot" bindToSkinAttribute="vectorRotation"  defaultValue="0">
 		                    <description>
 		                        Rotation
 		                    </description>
@@ -109,38 +129,91 @@
 							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
 							<!-- 	]]></constraint> -->
 							<!-- </constraints>-->
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>140</width>
+                                    <valueType>Numeric</valueType>
+                                    <afterDecimal>2</afterDecimal>
+                                </parameters>
+                            </widget>
 		                </variable>
 					</members>
 				</group>
                 <group id="AreaOfOrigin" label="Area of Origin">
                 	<members>
-						<variable id="CenterX" label="X" controlType="TF_INT" controlParameters="0,0,4" bindToSkinAttribute="positionX" defaultValue="0">
+						<variable id="CenterX" quantity="Position" label="X" bindToSkinAttribute="positionX" defaultValue="0">
 		                    <description>
 		                        X coordinate
 		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>140</width>
+                                    <valueType>Numeric</valueType>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>
 		                </variable>
-		                <variable id="CenterY" label="Y" controlType="TF_INT" controlParameters="70,0,4" bindToSkinAttribute="positionY" defaultValue="0">
+		                <variable id="CenterY" quantity="Position" label="Y" bindToSkinAttribute="positionY" defaultValue="0">
 		                    <description>
 		                        Y coordinate
 		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>140</width>
+                                    <valueType>Numeric</valueType>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>                            
 		                </variable>
-						<variable id="MajorAxis" label="X" controlType="TF_INT" controlParameters="0,0,4" bindToSkinAttribute="ellipseWidth" defaultValue="60">
+						<variable id="MajorAxis" quantity="Position" label="X" bindToSkinAttribute="ellipseWidth" defaultValue="60">
 		                    <description>
 		                        Major Axis
 		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>140</width>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>                            
 		                </variable>
-		                <variable id="MinorAxis" label="Y" controlType="TF_INT" controlParameters="70,0,4" bindToSkinAttribute="ellipseHeight" defaultValue="60">
+		                <variable id="MinorAxis" quantity="Position" label="Y" bindToSkinAttribute="ellipseHeight" defaultValue="60">
 		                    <description>
 		                        Minor Axis
 		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>140</width>
+                                    <valueType>Numeric</valueType>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>                            
 		                </variable>
-		                <variable id="Rotation" quantity="Direction" label="Rot" controlType="TF_REAL" controlParameters="140,0,3,2" bindToSkinAttribute="ellipseRotation"  defaultValue="90">
+		                <variable id="Rotation" quantity="Direction" label="Rot" bindToSkinAttribute="ellipseRotation"  defaultValue="90">
 							<!-- <constraints> -->
 							<!-- 	<constraint><![CDATA[ -->
 							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
 							<!-- 	]]></constraint> -->
 							<!-- </constraints>-->
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>140</width>
+                                    <valueType>Numeric</valueType>
+                                    <afterDecimal>2</afterDecimal>
+                                </parameters>
+                            </widget>
                         </variable>
+		                <variable id="Type" label="Y" bindToSkinAttribute="ellipseHeight" defaultValue="60">
+		                    <description>
+		                        Minor Axis
+		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>140</width>
+                                    <valueType>Numeric</valueType>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>                            
+		                </variable>                        
 					</members>
 				</group>                
 				<group id="controlProperties">
@@ -170,19 +243,19 @@
 						Screen ID of the component
 					</description>
 				</variable>
-                <variable id="direction" label="Direction" controlType="TF_INT" defaultValue="true" bindToSkinAttribute="reflectionY">
+                <variable id="direction" label="Direction" defaultValue="true" bindToSkinAttribute="reflectionY">
                     <description>
                         Direction of the moment
                     </description>
                 </variable>
                 <group id="visualProperties" label="Visual properties">
 					<members>
-                  <variable id="positionX" label="X" controlType="TF_INT" bindToSkinAttribute="positionX">
+                  <variable id="positionX" label="X" bindToSkinAttribute="positionX">
                       <description>
                           X coordinate
                       </description>
                   </variable>
-                  <variable id="positionY" label="Y" controlType="TF_INT" bindToSkinAttribute="positionY">
+                  <variable id="positionY" label="Y" bindToSkinAttribute="positionY">
                       <description>
                           Y coordinate
                       </description>

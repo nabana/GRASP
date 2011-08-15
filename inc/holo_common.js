@@ -210,7 +210,9 @@ HoloComponentLibrary.prototype = {
         this.jsURL = jsonObj["@jsURL"];
         this.rootComponentType = jsonObj["@rootComponentType"];
 
-        this.description = jsonObj.description[0];
+        if (jsonObj.description && jsonObj.description.length) {
+            this.description = jsonObj.description[0];
+        }
 
         if (jsonObj["dictionary"] && jsonObj["dictionary"].length){
             this.dictionary = new Dictionary();
@@ -318,7 +320,7 @@ function PropertyType(){}
 PropertyType.prototype = {
     id: null,
     label: null,
-    controlType: null,
+    widget: null,
     description: null,
     content: null,
     parentComponentType: null,
@@ -332,7 +334,9 @@ PropertyType.prototype = {
     initFromJSONObj: function(jsonObj){
         this.id = jsonObj["@id"];
         this.label = jsonObj["@label"];
-        this.controlType = jsonObj["@controlType"];
+        if (jsonObj["widget"] && jsonObj["widget"].length){
+            this.widget = jsonObj["widget"][0];
+        }
         this.customConstrainResolver = jsonObj["@customConstrainResolver"];
         if (jsonObj["description"] && jsonObj["description"].length){
             this.description = jsonObj["description"][0];
@@ -969,7 +973,7 @@ HoloComponentType.prototype = {
     propertyGroups: null,
     skinURL: null,
     iconURL: null,
-    internal: false,
+    //internal: false,                  // lost concept
     skin: null,
     parentLibrary: null,
     initialized: false,
@@ -993,7 +997,7 @@ HoloComponentType.prototype = {
             this.description = jsonObj["description"][0]["Text"];
         }
 
-        if (jsonObj["@internal"] && jsonObj["@internal"] == "true") this.internal = true;
+        //if (jsonObj["@internal"] && jsonObj["@internal"] == "true") this.internal = true;
         this.skinURL = this.parentLibrary.baseURL + "/" + jsonObj["@skinURL"];
         if (jsonObj["@iconURL"]) this.iconURL = this.parentLibrary.baseURL + "/" + jsonObj["@iconURL"];
         this.initialized = false;
