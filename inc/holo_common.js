@@ -973,7 +973,7 @@ HoloComponentType.prototype = {
     propertyGroups: null,
     skinURL: null,
     iconURL: null,
-    //internal: false,                  // lost concept
+    internal: false,              
     skin: null,
     parentLibrary: null,
     initialized: false,
@@ -997,7 +997,7 @@ HoloComponentType.prototype = {
             this.description = jsonObj["description"][0]["Text"];
         }
 
-        //if (jsonObj["@internal"] && jsonObj["@internal"] == "true") this.internal = true;
+        if (jsonObj["@internal"] && jsonObj["@internal"] == "true") this.internal = true;
         this.skinURL = this.parentLibrary.baseURL + "/" + jsonObj["@skinURL"];
         if (jsonObj["@iconURL"]) this.iconURL = this.parentLibrary.baseURL + "/" + jsonObj["@iconURL"];
         this.initialized = false;
