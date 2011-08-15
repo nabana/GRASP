@@ -437,7 +437,8 @@ div.clock {
     border: 1px solid red !important;
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=35)"; 
 	filter: alpha(opacity=35);
-	opacity: .15;	    
+	opacity: .15;	   
+    background-color: red;
 }
 
 .forbiddenPosition {

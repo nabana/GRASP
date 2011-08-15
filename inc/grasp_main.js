@@ -726,7 +726,7 @@ function GRASPComponentLibrary(){}
 
 GRASPComponentLibrary.prototype = {
 
-    }
+}
 
 $.extend(GRASPComponentLibrary.prototype, new HoloComponentLibrary());
 

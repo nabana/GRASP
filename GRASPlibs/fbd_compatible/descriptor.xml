@@ -56,7 +56,7 @@
                 This is the component that represents a two-dimensional force vector.
             </description>
         	<dictionary>
-        		<term id="WRONG_PLACE">This component can't really go there.</term>        
+        		<term id="WRONG_PLACE">This component can't really go there.</term>
         	</dictionary>
         	<onCreation><![CDATA[
 				if (!this.isDummy) {

@@ -59,6 +59,22 @@ LibraryManager.prototype = {
         return this.createNewComponentInstanceFromType(this.rootComponentType);
     },
 
+    translate: function(term_id){
+        
+        var result = term_id;
+
+        for (var i in this._libraries) {
+            var dict = this._libraries[i];
+            if (dict) {
+                result = dict.translate(term_id, true);
+                if (result != term_id) break;
+            }
+        }
+
+        return result;
+    },
+
+
     // event Handlers
     on_library_initialized: function(library){
         this.registerLibrary(library);
@@ -1947,12 +1963,12 @@ Dictionary.prototype = {
         this.initFromJSONObj($.xmlToJSON(xml));
     },
 
-    translate: function(term_id){
+    translate: function(term_id, doGlobal){
         if (isSet(this.terms[term_id])){
             return this.terms[term_id]; // HERE
-        } else if (player._library.dictionary && isSet(player._library.dictionary.terms[term_id])){
-            return player._library.dictionary.terms[term_id];
-        } else{
+        } else if (doGlobal){
+            return window.holoComponentManager.libraryManager.translate(term_id);
+        } else {
             return term_id;
         }
     }
@@ -2207,7 +2223,7 @@ Response.prototype = {
                 return this.source.type.dictionary.translate(this.code);
             }
             else{
-                return this.code;
+                return holoComponentManager.libraryManager.translate(this.code);
             }
         } else{
             return this.result;
