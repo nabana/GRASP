@@ -32,8 +32,10 @@
     <!-- // External JS libraries -->
     
     <script type="text/javascript">
+    window.DEBUG=true;
+
     $(document).ready(function(){
- 
+
  		player = new GRASPPlayer();
         player.contentHolder = $("[id='mainContent']");                
         player.loadDiagramDescriptorFromURL("diagrams/grasp_fbd_authoring_1.xml");        
@@ -83,7 +85,7 @@
 	</div>
 </div>
 <!--  *********************************** CONTEXT MENUS *********************************** -->
-<div id="componentMenu" style="display:none;width:200px;background-color:white;border:1px solid black;padding:5px;">
+<div id="componentMenu" class="context-menu">
     This is my custom context menu
 </div
 </body>

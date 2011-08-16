@@ -446,3 +446,11 @@ div.clock {
 	filter: alpha(opacity=35);
 	opacity: .35;	    
 }
+
+.context-menu {
+    display:none;
+    width:200px;
+    background-color:white;
+    border:1px solid black;
+    padding:5px;
+}

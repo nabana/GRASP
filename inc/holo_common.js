@@ -330,6 +330,7 @@ PropertyType.prototype = {
     constraints: null,
     dictionary: null,
     group: null,
+    inspectable: true,
 
     initFromJSONObj: function(jsonObj){
         this.id = jsonObj["@id"];
@@ -349,6 +350,8 @@ PropertyType.prototype = {
         if (jsonObj["constraints"] && jsonObj["constraints"].length){
             this.constraints.initFromJSONObj(jsonObj["constraints"][0]);
         }
+
+        if (jsonObj["@inspectable"] && jsonObj["@inspectable"] == "false") this.inspectable = false;
 
         if (this.parentComponentType && this.id){
             this.parentComponentType.registerPropertyType(this);
@@ -1712,7 +1715,15 @@ HoloComponent.prototype = {
                 }
                 
                 if (this.type.inspectable) {
-            		this.skinInstance.contextMenu('#componentMenu');
+            		this.skinInstance.contextMenu('#componentMenu', 
+                        {
+                            beforeShow: function () { 
+                                var hostComponent = $(this.target).data('hostComponent');
+//                                var menuContents = ${
+                            }
+                        
+                        }
+                    );
                 }
 
             }
