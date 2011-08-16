@@ -34,18 +34,20 @@
     <componentTypes>
         <componentType id="RootComponentType" skinURL="root.html" internal="true">
             <properties>
+                <!-- <variable id="Instructions" label="Instructions"> -->
+                <!-- </variable> -->
                 <set id="children" maxSize="10">
 					<dictionary>
 						<term id="SET_SIZE_EXCEEDED">Too many members.</term>		
 					</dictionary>
 					<memberType>
 						<reference targetType="*" visualizedAs="CONTAINMENT">
-							<constraints>
-								<constraint><![CDATA[
-									//trace(this.value+">"+this.presetValue.id);
-									return new Response(true);
-								]]></constraint>
-							</constraints>
+							<!-- <constraints> -->
+							<!-- 	<constraint><![CDATA[ -->
+							<!-- 		trace(this.value+">"+this.presetValue.id); -->
+							<!-- 		return new Response(true); -->
+							<!-- 	]]></constraint> -->
+							<!-- </constraints> -->
 							<dictionary>
 								<term id="TYPE_MISMATCH">This memebertype can not be accepted here.</term>		
 							</dictionary>
@@ -81,8 +83,6 @@
                 <!--     } -->
                 <!-- ]]></constraint> -->
                 <constraint><![CDATA[
-                    trace(this.presetPropertyValues['MinorAxis']+" "+this.presetPropertyValues['MajorAxis']);
-
                     if (this.presetPropertyValues['MajorAxis'] != undefined && this.presetPropertyValues['MinorAxis'] != undefined) {
                        if (this.presetPropertyValues['MajorAxis'] < 30 || this.presetPropertyValues['MinorAxis'] < 30 ||
                            this.presetPropertyValues['MajorAxis'] > 150 || this.presetPropertyValues['MinorAxis'] > 150  ) {
@@ -102,11 +102,24 @@
 						Screen ID of the component
 					</description>
 				</variable>
-                <variable id="MagValid" defaultValue="0"/>
-                <variable id="MagValid" defaultValue="0"/>
-                <variable id="MagnitudeFuzz" defaultValue="0"/>
-                <variable id="Magnitude" defaultValue="1"/>
-                <variable id="DirectionFuzz" defaultValue="3"/>   
+
+                <group id="magnitudeProperties" label="Magnitude">
+                    <members>
+                        <variable id="Magnitude" defaultValue="1"/>
+                        <variable id="MagnitudeFuzz" label="Magnitude fuzziness" defaultValue="0">
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>40</width>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget> 
+                        </variable>
+                        <variable id="MagValid" label="Validate magnitude" defaultValue="unchecked">
+                            <widget type="CheckBox"/>
+                        </variable>                
+                    </members>
+                </group>
+
                 <variable id="Type" defaultValue="N">
                     <widget type="DropDown">
                         <parameters>
@@ -117,11 +130,12 @@
                         </parameters>
                     </widget>
                 </variable>
-                <group id="visualProperties" label="Visual properties">
+
+                <group id="visualProperties" label="Direction">
                 	<members>
 		                <variable id="Direction" quantity="Direction" label="Rot" bindToSkinAttribute="vectorRotation"  defaultValue="0">
 		                    <description>
-		                        Rotation
+		                        Direction
 		                    </description>
                         	<dictionary>
                 	        	<term id="WRONG_DIRECTION">Wrong direction.</term>
@@ -134,13 +148,24 @@
                             <widget type="TextField">
                                 <parameters>
                                     <width>140</width>
-                                    <valueType>Numeric</valueType>
                                     <afterDecimal>2</afterDecimal>
                                 </parameters>
                             </widget>
 		                </variable>
+                        <variable id="DirectionFuzz" label="Direction fuzziness" defaultValue="3">
+                            <widget type="TextField">
+                                <parameters>
+                                    <width>40</width>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>                        
+                        </variable>
+                        <variable id="DirValid" label="Validate direction" defaultValue="unchecked">
+                            <widget type="CheckBox"/>
+                        </variable>
 					</members>
 				</group>
+
                 <group id="AreaOfOrigin" label="Area of Origin">
                 	<members>
 						<variable id="CenterX" quantity="Position" label="X" bindToSkinAttribute="positionX" defaultValue="0">
@@ -150,7 +175,6 @@
                             <widget type="TextField">
                                 <parameters>
                                     <width>140</width>
-                                    <valueType>Numeric</valueType>
                                     <afterDecimal>0</afterDecimal>
                                 </parameters>
                             </widget>
@@ -162,7 +186,6 @@
                             <widget type="TextField">
                                 <parameters>
                                     <width>140</width>
-                                    <valueType>Numeric</valueType>
                                     <afterDecimal>0</afterDecimal>
                                 </parameters>
                             </widget>                            
@@ -199,14 +222,14 @@
                             <widget type="TextField">
                                 <parameters>
                                     <width>140</width>
-                                    <valueType>Numeric</valueType>
                                     <afterDecimal>2</afterDecimal>
                                 </parameters>
                             </widget>
                         </variable>
 		                                
 					</members>
-				</group>                
+				</group>
+
 				<group id="controlProperties">
 					<members>
 						<variable id="draggable" defaultValue="true"/>

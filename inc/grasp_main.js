@@ -498,9 +498,10 @@ GRASPPlayer.prototype = {
         if (window.holoComponentManager.operationManager.beingRecordedOperation){
             window.holoComponentManager.operationManager.beingRecordedOperation.addAction(new ActionFootprint("ClearSelection", [window.player.selectedComponentIds.join(",")]));
         }
-
-        for (var i in window.player.selectedComponents){
-            window.player.selectedComponents[i].deselect();
+        if (window.player && window.player.selectedComponents) {
+            for (var i=0; i< window.player.selectedComponents.length; i++){
+                window.player.selectedComponents[i].deselect();
+            }
         }
         window.player.selectedComponents = [];
         window.player.selectedComponentIds = [];
