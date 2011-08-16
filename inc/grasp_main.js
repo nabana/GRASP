@@ -176,6 +176,8 @@ function GRASPPlayer(initObj){
 
     this.libraryManager = new GRASPLibraryManager();
 
+    $.contextMenu.shadow = false;
+
     trace("GRASPPlayer " + this.version + " created.");
 }
 

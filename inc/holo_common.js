@@ -975,7 +975,8 @@ HoloComponentType.prototype = {
     propertyGroups: null,
     skinURL: null,
     iconURL: null,
-    internal: false,              
+    internal: false, 
+    inspectable: true,
     skin: null,
     parentLibrary: null,
     initialized: false,
@@ -1000,6 +1001,7 @@ HoloComponentType.prototype = {
         }
 
         if (jsonObj["@internal"] && jsonObj["@internal"] == "true") this.internal = true;
+        if (jsonObj["@inspectable"] && jsonObj["@inspectable"] == "false") this.inspectable = false;
         this.skinURL = this.parentLibrary.baseURL + "/" + jsonObj["@skinURL"];
         if (jsonObj["@iconURL"]) this.iconURL = this.parentLibrary.baseURL + "/" + jsonObj["@iconURL"];
         this.initialized = false;
@@ -1709,6 +1711,9 @@ HoloComponent.prototype = {
                     }
                 }
                 
+                if (this.type.inspectable) {
+            		this.skinInstance.contextMenu('#componentMenu');
+                }
 
             }
 
