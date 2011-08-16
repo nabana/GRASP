@@ -125,7 +125,31 @@
                         <parameters>
                             <width>100</width>
                             <getPossibleValues><![CDATA[
-                			    return {"N": "N", "K": "K"};
+                                var vectorTypes = [ 'Undefined',
+                                                    'Weight',
+                                                    'Electrical Force',
+                                                    'Magnetic Force',
+                                                    'Applied Force',
+                                                    'Tension',
+                                                    'Muscle Force',
+                                                    'Normal Force',
+                                                    'Friction Force',
+                                                    'General Reaction Force',
+                                                    'GRF, Horizontal Component',
+                                                    'GRF, Vertical Component',
+                                                    'Joint Reaction Force',
+                                                    'JRF, Horizontal Component',
+                                                    'JRF, Vertical Component' ];
+                            
+                                var vectorCodes = ['U', 'W', 'E', 'M', 'F', 'T', 'L', 'N', 'ff', 'R', 'Rx', 'Ry', 'J', 'Jx', 'Jy'];
+
+                                var result = {};
+
+                                for (var i=0; i<vectorCodes.length; i++) {
+                                    result[vectorCodes[i]] = vectorTypes[i];
+                                }
+
+                                return result;
                             ]]></getPossibleValues>
                         </parameters>
                     </widget>

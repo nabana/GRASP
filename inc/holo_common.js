@@ -1719,8 +1719,16 @@ HoloComponent.prototype = {
                         {
                             beforeShow: function () { 
                                 var hostComponent = $(this.target).data('hostComponent');
-//                                var menuContents = ${
-                            }
+                                var contentHolder = this.menu.find('[class="content"]');
+
+                                contentHolder.text("Alma");
+                            },
+
+                            // hideCallback: function () {
+                            //     var contentHolder = $(this.target).$('.contentHolder')[0];
+
+                            //     contentHolder.text("");
+                            // }   
                         
                         }
                     );

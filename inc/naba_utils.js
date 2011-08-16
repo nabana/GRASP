@@ -373,7 +373,3 @@ function IsIE8Browser() {
     }
     return (rv == 4);
 }
-
-
-
-
