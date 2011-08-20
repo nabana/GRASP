@@ -114,6 +114,7 @@ function HoloComponentManager(){
     this.operationManager.registerAction("ComponentCreation", ComponentCreation);
     this.operationManager.registerAction("ComponentDeletion", ComponentDeletion);
 
+
     trace("holoComponentManager created");
 }
 
@@ -122,6 +123,8 @@ HoloComponentManager.prototype = {
     _maxCountByType: [],
     operationManager: null,
     libraryManager: null,
+
+    propertiesPanel: null,
 
     registerComponent: function(component){
         this._components = this._components || {};
@@ -1715,8 +1718,13 @@ HoloComponent.prototype = {
                 }
                 
                 if (this.type.inspectable) {
-            		this.skinInstance.contextMenu('#componentMenu', 
-                        {
+
+                   //this.skinInstance.bind("contextmenu",function(e){
+                     //   return false;
+                  // }); 
+                    
+     /*       		this.skinInstance.contextMenu('#componentMenu', 
+                       {
                             beforeShow: function () { 
                                 var hostComponent = $(this.target).data('hostComponent');
                                 var contentHolder = this.menu.find('[class="content"]');
@@ -1724,14 +1732,14 @@ HoloComponent.prototype = {
                                 contentHolder.text("Alma");
                             },
 
-                            // hideCallback: function () {
-                            //     var contentHolder = $(this.target).$('.contentHolder')[0];
+                            hideCallback: function () {
+                                var contentHolder = $(this.target).$('.contentHolder')[0];
 
-                            //     contentHolder.text("");
-                            // }   
+                                contentHolder.text("");
+                            }   
                         
                         }
-                    );
+                    );*/
                 }
 
             }

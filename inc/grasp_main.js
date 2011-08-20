@@ -176,7 +176,13 @@ function GRASPPlayer(initObj){
 
     this.libraryManager = new GRASPLibraryManager();
 
-    $.contextMenu.shadow = false;
+   // $.contextMenu.shadow = false;
+
+    $('body').bind('contextmenu',function(){
+        window.player.removePropertiesPanel();
+        return false;
+    });
+    
 
     trace("GRASPPlayer " + this.version + " created.");
 }
@@ -209,6 +215,62 @@ GRASPPlayer.prototype = {
 
     showMessage: function(msg){
         trace(msg);
+    },
+
+    removePropertiesPanel: function() {
+        if (window.player.propertiesPanel) {
+            trace("hide"); // HERE
+            window.player.tobeRemovedPropertiesPanel = window.player.propertiesPanel;
+            window.player.propertiesPanel.hide(.3, function(){
+               $(this).remove();
+            });
+        }
+    },
+
+    renderPropertiesPanelFor: function(id) {
+
+        var c = window.holoComponentManager.getComponentById(id);
+
+        if (c && c.type.inspectable) {
+            // setting up new propertiespanel
+            var panel = $('<div/>', {
+                'class': 'context-menu',
+                id: 'propertiesPanel',
+                text: 'Ehh'
+            });
+
+            $('body').append(panel);
+
+            var offset = c.skinInstance.offset();
+            var cWidth = c.skinInstance.outerWidth(true);
+            var pWidth = panel.width();
+
+            c.skinInstance.find('.skinWrapper').children().each(function() {
+                cWidth += $(this).outerWidth( true );
+            });
+
+            trace(cWidth);
+
+            var left = 0;
+            var top = offset.top;
+
+            if (offset.left+cWidth+pWidth > $(document).width()) {
+                left = offset.left - pWidth;
+            } else {
+                left = offset.left+cWidth;
+            }
+
+            panel.css('left', left);
+            panel.css('top', top);
+
+            panel.show();
+
+            this.propertiesPanel = panel;
+
+            trace("show");
+
+        }
+
     },
 
     parseDiagramDescriptor: function(xml){
@@ -280,7 +342,8 @@ GRASPPlayer.prototype = {
 		v1.moveTo(100,100);
 		
 		var rootChildrenSet = this.rootComponent.getProperty("children");
-	   trace(rootChildrenSet.addMemberForValue(v1.id));
+
+        rootChildrenSet.addMemberForValue(v1.id);
     },
 
     refreshmenu: function(){
@@ -465,12 +528,15 @@ GRASPPlayer.prototype = {
         window.player.operationManager.addEventListener("OPERATION_ACCESSED", this.refreshUndoRedo);
     },
 
-    setSelection: function(ids, addToExistingSelection){
+    setSelection: function(ids, addToExistingSelection, record){
+
+        var changed = false;
 
         if (addToExistingSelection !== true && window.player.selectedComponents && window.player.selectedComponents.length){
             this.clearSelection();
+            changed = true;
         }
-        
+
         for (var i in ids) {
 
             var id = ids[i];
@@ -478,6 +544,7 @@ GRASPPlayer.prototype = {
             
             if (c && c.getPropertyValue("selectable") != "false" && (!(window.player.selectedComponents && window.player.selectedComponents.length) || window.player.selectedComponents && window.player.selectedComponents.length && window.player.selectedComponents.indexOf(c) == -1)){
     
+
                 c.select();
     
                 window.player.selectedComponents = window.player.selectedComponents || [];
@@ -485,13 +552,17 @@ GRASPPlayer.prototype = {
                 
                 window.player.selectedComponentIds = window.player.selectedComponentIds || [];
                 window.player.selectedComponentIds.push(c.id);
+
+                changed = true;
                 
             }
          }
 
-        if (window.holoComponentManager.operationManager.beingRecordedOperation){
+        if (changed && window.holoComponentManager.operationManager.beingRecordedOperation){
             window.holoComponentManager.operationManager.beingRecordedOperation.addAction(new ActionFootprint("ComponentSelection", [window.player.selectedComponentIds.join(",")], addToExistingSelection));
         }
+
+        return changed;
 
     },
 
@@ -592,9 +663,13 @@ GRASPPlayer.prototype = {
             window.player.selectedComponentIds = window.player.selectedComponentIds || [];
 			if (window.player.selectedComponentIds.indexOf(id) == -1) {
               window.holoComponentManager.operationManager.recordOperation("Change selection");
-              window.player.setSelection([id], e.shiftKey );
-              window.holoComponentManager.operationManager.finishRecording(true);
-            }            
+              var res = window.player.setSelection([id], e.shiftKey );
+              window.holoComponentManager.operationManager.finishRecording(res);
+            }           
+
+            if (e.which == 3) {
+                window.player.renderPropertiesPanelFor(id);
+            }
         }
     },
 

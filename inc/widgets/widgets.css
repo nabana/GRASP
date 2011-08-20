@@ -1,0 +1,107 @@
+.labelContainer {
+    width: 220px;
+    text-align: right;
+    font-weight: bold;
+    color: #555;
+}
+
+.valueContainer {
+
+}
+
+.statusContainer {
+    width: 20px;
+    text-align: center;
+    display: inline-block;
+    line-height: 28px;
+    vertical-align: middle;
+}
+
+.statusContainer .ok {
+    background-image: url(ok_mark_small.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 19px;
+    height: 25px;
+}
+
+.statusContainer .not_ok {
+    background-image: url(not_ok_mark_small.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 19px;
+    height: 25px;
+}
+
+
+.controlContainer {
+    width: 220px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 16px;
+}
+
+.DISPLAY .controlContainer {
+    width: 120px;
+}
+
+.propertyValue {
+    width: 205px;
+    vertical-align: middle;
+}
+
+.hintContainer {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 16px;
+    padding-top: 2px;
+    padding-left: 3px;
+}
+
+.hintContainer.error{
+    font-size: 11px;
+    color: #e60000;
+}
+
+.propertyValue.Taxon.INPUT {
+    font-size: 11px;
+    text-transform: capitalize;
+    background-color: #333;
+    display: inline-block;
+    width: auto;
+    padding: 2px 8px 0px 8px;
+    color: #fff;
+    border: 1px solid #000;
+    cursor: crosshair;
+    line-height: 16px;
+}
+
+.Taxon.disabled {
+    cursor: default;
+    color: #555;
+    border: 1px dotted #555;
+    background-color: #fff;
+}
+
+.propertyValue.Taxon.enabled:hover {
+    background-color: #fff;
+    color: #ff0066;
+    border-color: #ff0066;
+}
+
+.widgetSkin.DISPLAY .statusContainer {
+    display: none;
+}
+
+input.numeric {
+    width: 60px;
+    text-align: right;
+}
+
+.unit {
+    margin-left: 3px;
+}
+
+input[type="checkbox"] {
+    width: 15px;
+}

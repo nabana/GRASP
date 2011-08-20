@@ -124,7 +124,7 @@
                     <widget type="DropDown">
                         <parameters>
                             <width>100</width>
-                            <getPossibleValues><![CDATA[
+                            <optionsProvider><![CDATA[
                                 var vectorTypes = [ 'Undefined',
                                                     'Weight',
                                                     'Electrical Force',
@@ -150,7 +150,7 @@
                                 }
 
                                 return result;
-                            ]]></getPossibleValues>
+                            ]]></optionsProvider>
                         </parameters>
                     </widget>
                 </variable>
