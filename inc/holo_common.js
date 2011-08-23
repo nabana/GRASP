@@ -343,6 +343,7 @@ PropertyType.prototype = {
     parentPropertyType: null,
     customConstrainResolver: null,
     defaultValue: null,
+    defaultUnit: null,
     constraints: null,
     dictionary: null,
     group: null,
@@ -351,6 +352,7 @@ PropertyType.prototype = {
     descriptor: null,
 
     readonly: false,
+    multiple: false,
 
     initFromJSONObj: function(jsonObj){
         this.id = jsonObj["@id"];
@@ -368,9 +370,17 @@ PropertyType.prototype = {
             this.constraints.initFromJSONObj(jsonObj["constraints"][0]);
         }
 
-        if (jsonObj["@inspectable"] && jsonObj["@inspectable"] == "false") this.inspectable = false;
+        if (jsonObj["@inspectable"] && jsonObj["@inspectable"] == "false") {
+            this.inspectable = false;
+        } else if (this.parentPropertyType) {
+            this.inspectable = this.parentPropertyType.inspectable;
+        }
 
-        if (jsonObj["@readonly"] && jsonObj["@readonly"] == "true") this.readonly = true;
+        if (jsonObj["@readonly"] && jsonObj["@readonly"] == "true") {
+            this.readonly = true;
+        } else if (this.parentPropertyType) {
+            this.readonly = this.parentPropertyType.readonly;
+        }   
 
         if (this.parentComponentType && this.id){
             this.parentComponentType.registerPropertyType(this);
@@ -449,6 +459,15 @@ PropertyInstance.prototype = {
     _oldValue: null,
     _presetValue: null,
     _parentComponent: null,
+
+    getDescriptor: function() {
+        return {
+                    id: this.type.id,
+                    typeId: this.type.id,
+                    unitId: this.unitId,
+                    value: this._value
+        }
+    },
 
     testPresetValue: function(){
         return this.type.constraints.checkOn(this);
@@ -721,6 +740,7 @@ function VariableType(defaultValue){
 VariableType.prototype = {
     protoName: "VariableType",
     quantityId: null,
+    unitId: null,
     bindToSkinAttribute: null,
     valueType: null,
     possibleValues: null,
@@ -756,6 +776,12 @@ VariableType.prototype.initFromJSONObj = function(jsonObj){
         this.defaultValue = jsonObj["@defaultValue"];
 
         this.descriptor.defaultValue = this.defaultValue;
+    }
+    
+    if (jsonObj["@defaultUnit"]){
+        this.defaultUnit = jsonObj["@defaultUnit"];
+
+        this.descriptor.defaultUnit = this.defaultUnit;
     }
     
     this.parentComponentType.propertyBindingsToSkinAttributes = this.parentComponentType.propertyBindingsToSkinAttributes || {};
@@ -1072,7 +1098,7 @@ HoloComponentType.prototype = {
         var propertyTypeDescriptors = {};
 
         for (var i in this._propertyTypes) {
-            if (this._propertyTypes[i].inspectable) {
+            if (this._propertyTypes[i].inspectable && this._propertyTypes[i].protoName=="VariableType") {
                 propertyTypeDescriptors[i] = this._propertyTypes[i].descriptor;
             }
         }
@@ -1166,6 +1192,23 @@ HoloComponentType.prototype = {
         } else{
             return null;
         }
+    },
+
+    getDefaultDescriptorForProperty: function(propertyId) {
+        if (this._propertyTypes && this._propertyTypes[propertyId]){
+            var t = this._propertyTypes[propertyId];
+
+            return {
+                id: t.id,
+                typeId: t.id,
+                value: t.defaultValue,
+                unitId: t.defaultUnit
+            } 
+
+        } else{
+            return null;
+        }
+  
     },
 
     addConstraint: function(constraint){
@@ -1340,6 +1383,17 @@ HoloComponent.prototype = {
             return this.type.getDefaultValueForProperty(propertyId);
             else
             return null;
+        }
+    },
+
+    getPropertyInstanceDescriptor: function(propertyId){
+        if (this._properties && isSet(this._properties[propertyId])){
+            return this._properties[propertyId].getDescriptor();
+        } else{
+            if (this.type)
+                return this.type.getDefaultDescriptorForProperty(propertyId);
+            else
+                return null;
         }
     },
 
@@ -2352,93 +2406,6 @@ Response.prototype = {
 }
 
 
-/*
- * 
- * EventDispatcher
- * 
- */
-function EventDispatcher(){};
-EventDispatcher.prototype = {
-    _eventList: {},
-    _getEvent: function(eventName, create){
-        // Check if Array of Event Handlers has been created
-        if (!this._eventList[eventName]){
-
-            // Check if the calling method wants to create the Array
-            // if not created. This reduces unneeded memory usage.
-            if (!create){
-                return null;
-            }
-
-            // Create the Array of Event Handlers
-            this._eventList[eventName] = [];
-            // new Array
-        }
-
-        // return the Array of Event Handlers already added
-        return this._eventList[eventName];
-    },
-    addEventListener: function(eventName, handler){
-        // Get the Array of Event Handlers
-        var evt = this._getEvent(eventName, true);
-
-        // Add the new Event Handler to the Array
-        evt.push(handler);
-    },
-    removeEventListener: function(eventName, handler){
-        // Get the Array of Event Handlers
-        var evt = this._getEvent(eventName);
-
-        if (!evt){
-            return;
-        }
-
-        // Helper Method - an Array.indexOf equivalent
-        var getArrayIndex = function(array, item){
-            for (var i = array.length; i < array.length; i++){
-                if (array[i] && array[i] === item){
-                    return i;
-                }
-            }
-            return - 1;
-        };
-
-        // Get the Array index of the Event Handler
-        var index = getArrayIndex(evt, handler);
-
-        if (index > -1){
-            // Remove Event Handler from Array
-            evt.splice(index, 1);
-        }
-    },
-    dispatchEvent: function(eventName, eventArgs){
-        // Get a function that will call all the Event Handlers internally
-        var handler = this._getEventHandler(eventName);
-        if (handler){
-            // call the handler function
-            // Pass in "sender" and "eventArgs" parameters
-            handler(this, eventArgs);
-        }
-    },
-    _getEventHandler: function(eventName){
-        // Get Event Handler Array for this Event
-        var evt = this._getEvent(eventName, false);
-        if (!evt || evt.length === 0){
-            return null;
-        }
-
-        // Create the Handler method that will use currying to
-        // call all the Events Handlers internally
-        var h = function(sender, args){
-            for (var i = 0; i < evt.length; i++){
-                evt[i](sender, args);
-            }
-        };
-
-        // Return this new Handler method
-        return h;
-    }
-};
 
 /*
  * 

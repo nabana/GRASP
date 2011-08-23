@@ -302,6 +302,16 @@ EventDispatcher.prototype = {
             evt.splice(index, 1);
         }
     },
+    removeAllEventListeners: function(eventName) {
+                // Get the Array of Event Handlers
+        var evt = this._getEvent(eventName);
+
+        if (!evt){
+            return;
+        }
+        
+        evt.splice(0, evt.length);
+    },
     dispatchEvent: function(eventName, eventArgs){
         // Get a function that will call all the Event Handlers internally
         var handler = this._getEventHandler(eventName);

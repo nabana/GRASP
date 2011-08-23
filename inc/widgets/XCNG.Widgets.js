@@ -47,9 +47,12 @@ $xcng.widgets.WidgetList.prototype = {
     onValueChange_ctx: null,
 
     renderPropertyWidgets: function() {
+        trace('renderPropertyWidgets');
         if (this.propertyInstanceDescriptors) {
-
+            trace('propertyInstanceDescriptors');
+            
             if (!this.widgetsHolder) {
+                trace('renderPropertyWidgets2');
                 this.widgetsHolder = $(this.widgetsHolderTemplate);
                 this.widgetsHolder.attr('id', this.id);
                 this.widgetsHolder.addClass('widgetsList');
@@ -67,6 +70,7 @@ $xcng.widgets.WidgetList.prototype = {
                     this.widgetsHolder.appendTo(this.containerElement);
                 }
             }
+            trace('renderPropertyWidgets3');
             
             this.removePropertyWidgets();
             this.propertyWidgets && this.propertyWidgets.length && this.removePropertyWidtgets();
@@ -76,8 +80,10 @@ $xcng.widgets.WidgetList.prototype = {
             for (var i=0; i<this.propertyInstanceDescriptors.length; i++) {
                 var d = this.propertyInstanceDescriptors[i];
 
+                
                 var widgetType = this.propertyTypeDescriptors[d.typeId].widget;
-
+                
+                trace(widgetType);
                 if ($.isFunction($xcng.widgets[widgetType])){
                     var widget = new  $xcng.widgets[widgetType](d, this.mode, this);
                     if (this.widgetSkinTemplate) widget.skinTemplate = this.widgetSkinTemplate;
@@ -99,7 +105,7 @@ $xcng.widgets.WidgetList.prototype = {
     removePropertyWidgets: function() {
         if(this.propertyWidgets) {
             for (var i=0; i<this.propertyWidgets.length; i++) {
-                this.propertyWidgets[i].removeEventListener("VALUE_CHANGED", this.on_property_VALUE_CHANGED);
+                this.propertyWidgets[i].removeAllEventListeners("VALUE_CHANGED");
                 this.propertyWidgets[i].remove();
             }
 
@@ -410,17 +416,16 @@ $xcng.widgets.DropDown.prototype = {
 
                     control.attr('multiple', 'multiple');
 
-                    for (var i = 0; i<this.propertyTypeDescriptor.possibleValues.length; i++) {
-                        var index = this.propertyInstanceDescriptor.value.indexOf(this.propertyTypeDescriptor.possibleValues[i]);                        
-                        control.append('<option'+( index > -1 ? ' selected="selected"': '')+'>'+this.propertyTypeDescriptor.possibleValues[i]+'</option>');
+                    for (var i in this.propertyTypeDescriptor.possibleValues) {
+                        var index = this.propertyInstanceDescriptor.value.indexOf(i);
+
+                        control.append('<option'+( index > -1 ? ' selected="selected"': '')+' value="'+i+'" >'+this.propertyTypeDescriptor.possibleValues[i]+'</option>');
                     }
 
                 } else {
-
-                    var selectedIndex = this.propertyTypeDescriptor.possibleValues.indexOf(this.propertyInstanceDescriptor.value);
-
-                    for (var i = 0; i<this.propertyTypeDescriptor.possibleValues.length; i++) {
-                        control.append('<option'+(i==selectedIndex ? ' selected="selected"': '')+'>'+this.propertyTypeDescriptor.possibleValues[i]+'</option>');
+                   
+                    for (var i  in this.propertyTypeDescriptor.possibleValues) {
+                        control.append('<option'+(i==this.propertyInstanceDescriptor.value ? ' selected="selected"': '')+' value="'+i+'" >'+this.propertyTypeDescriptor.possibleValues[i]+'</option>');
                     }
 
                 }
@@ -508,20 +513,20 @@ $xcng.widgets.TBrowser.prototype = {
     },
     
     openTBRowserPanelForTaxonomy: function(taxonomy) {
-        $xcng.ShowTBrowserPanel("Selecting a value for <i>"+this.propertyInstanceDescriptor.label+"</i>",  taxonomy, [this.propertyInstanceDescriptor.value.id], this.setValueFromBrowser, this);
+        $xcng.ShowTBrowserPanel("Selecting a value for <i>"+this.propertyInstanceDescriptor.value.label+"</i>",  taxonomy, [this.propertyInstanceDescriptor.value.id], this.setValueFromBrowser, this);
     },
 
     setValueFromBrowser: function(value) {
         if (value) {
-            this.propertyInstanceDescriptor.value = value[0].label;
-            this.propertyInstanceDescriptor.value_ext.id = value[0].id;
-
-            this.control.text(this.propertyInstanceDescriptor.value+" [+]");
-
-            this._triggerChange();
+            oldId = this.propertyInstanceDescriptor.value.id;
+            this.propertyInstanceDescriptor.value = {id: value[0].id, label: value[0].label}
+            this.control.text(this.propertyInstanceDescriptor.value.label+" [+]");
+            
+            if (oldId != this.propertyInstanceDescriptor.value.id){
+                this._triggerChange();
+            }
         }
         $xcng.KillTBrowserPanel();
-        
     }
 }
 

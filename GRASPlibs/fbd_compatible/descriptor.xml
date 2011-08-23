@@ -97,15 +97,26 @@
 						Symbol of the component
 					</description>
 				</variable>
-				<variable id="screenId" label="Screen ID" defaultValue="x" readonly="true">
+				<variable id="screenId" label="Screen ID" defaultValue="x" readonly="true" inspectable="false">
 					<description>
 						Screen ID of the component
 					</description>
+                    <widget type="TextField">
+                        <parameters>
+                            <parameter id="width">80</parameter>
+                        </parameters>
+                    </widget>                     
 				</variable>
 
                 <group id="magnitudeProperties" label="Magnitude">
                     <members>
-                        <variable id="Magnitude" defaultValue="1"/>
+                        <variable id="Magnitude" label="Magnitude" defaultValue="1" quantity="ForceMagnitude">
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget>                        
+                        </variable>
                         <variable id="MagnitudeFuzz" label="Magnitude fuzziness" defaultValue="0">
                             <widget type="TextField">
                                 <parameters>
@@ -119,10 +130,10 @@
                     </members>
                 </group>
 
-                <variable id="Type" defaultValue="N">
+                <variable id="Type" defaultValue="U" label="Type">
                     <widget type="DropDown">
                         <parameters>
-                            <parameter id="width">100</parameter>
+                            <parameter id="width">150</parameter>
                         </parameters>
                     </widget>
                     <possibleValues>
@@ -153,21 +164,21 @@
                         	<dictionary>
                 	        	<term id="WRONG_DIRECTION">Wrong direction.</term>
                         	</dictionary>                            
-							<!-- <constraints> -->
-							<!-- 	<constraint><![CDATA[ -->
-							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
-							<!-- 	]]></constraint> -->
-							<!-- </constraints>-->
+							<constraints>
+								<constraint><![CDATA[
+									 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this);
+								]]></constraint>
+							</constraints>
                             <widget type="TextField">
                                 <parameters>
-                                    <parameter id="width">100</parameter>
+                                    <parameter id="width">40</parameter>
                                 </parameters>
                             </widget>
 		                </variable>
                         <variable id="DirectionFuzz" label="Direction fuzziness" defaultValue="3">
                             <widget type="TextField">
                                 <parameters>
-                                    <parameter id="width">100</parameter>
+                                    <parameter id="width">40</parameter>
                                 </parameters>
                             </widget>                        
                         </variable>
@@ -179,13 +190,20 @@
 
                 <group id="AreaOfOrigin" label="Area of Origin">
                 	<members>
+                        <variable id="Area" label="Area name">
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">80</parameter>
+                                </parameters>
+                            </widget>                            
+                        </variable>
 						<variable id="CenterX" quantity="Position" label="X" bindToSkinAttribute="positionX" defaultValue="0">
 		                    <description>
 		                        X coordinate
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <parameter id="width">100</parameter>
+                                    <parameter id="width">40</parameter>
                                 </parameters>
                             </widget>
 		                </variable>
@@ -195,7 +213,7 @@
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <parameter id="width">100</parameter>
+                                    <parameter id="width">40</parameter>
                                 </parameters>
                             </widget>                            
 		                </variable>
@@ -205,7 +223,7 @@
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <parameter id="width">100</parameter>
+                                    <parameter id="width">40</parameter>
                                     <afterDecimal>0</afterDecimal>
                                 </parameters>
                             </widget>                            
@@ -216,7 +234,7 @@
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <parameter id="width">100</parameter>
+                                    <parameter id="width">40</parameter>
                                     <afterDecimal>0</afterDecimal>
                                 </parameters>
                             </widget>                            
@@ -230,7 +248,7 @@
 							<!-- </constraints>-->
                             <widget type="TextField">
                                 <parameters>
-                                    <parameter id="width">100</parameter>
+                                    <parameter id="width">40</parameter>
                                 </parameters>
                             </widget>
                         </variable>

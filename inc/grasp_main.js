@@ -223,6 +223,13 @@ GRASPPlayer.prototype = {
         if (panel) {
             trace("in removePropertiesPanel"); // HERE
             panel.hide();
+            for (var i in window.player.propertyLists) {
+                window.player.propertyLists[i].removePropertyWidgets();
+            }
+
+            panel.remove();
+
+            window.player.inspectedComponent = null;
         }
     },
 
@@ -263,45 +270,99 @@ GRASPPlayer.prototype = {
 
             // here comes the content
             
-            var lists = [];
-
             var quantities = this.libraryManager.getQuantities();
-
             var propertyTypeDescriptors = c.type.getPropertyDescriptors();
 
+            var groupLists = {};
+
+            var listHolder = $('<div/>', {
+                'class': 'listHolder',
+            });
+
+
+            // for properties not belonging to any group
+            
+            var freeList = new $xcng.widgets.WidgetList({
+                id: 'inputWidgetList_'+i+'_for_'+c.id, 
+                containerElement: listHolder, 
+                label: null, 
+                mode: 'INPUT', 
+
+                quantities: quantities,
+                propertyTypeDescriptors: propertyTypeDescriptors, 
+                propertyInstanceDescriptors: null, 
+
+                onValueChange: function (args) {
+                    trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
+                    var respond = window.player.inspectedComponent.setPropertyValue(args.id, args.value);
+                    if (!respond.result) {
+                        
+                    }
+
+                },
+                onValueChange_ctx: this,
+                widgetLabelPostfix: ":"
+            });
+                
+
             for (var i in c.type.propertyGroups) {
-                
-                var listHolder = $('<div/>', {
-                    'class': 'listHolder',
-                });
-                
-                panelContent.append(listHolder);
-
-
-                for (var j = 0; j < c.type.propertyGroups[i].members.length; j++) {
+                if (c.type.propertyGroups[i].inspectable) {
                     
+                    panelContent.append(listHolder);
+
+                    var list = new $xcng.widgets.WidgetList({
+                        id: 'inputWidgetList_'+i+'_for_'+c.id+'_'+c.type.propertyGroups[i].id, 
+                        containerElement: listHolder, 
+                        label: c.type.propertyGroups[i].label, 
+                        mode: 'INPUT', 
+
+                        quantities: quantities,
+                        propertyTypeDescriptors: propertyTypeDescriptors, 
+                        propertyInstanceDescriptors: null,
+
+                        onValueChange: function (args) {
+                            trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
+
+                            var respond = window.player.inspectedComponent.setPropertyValue(args.id, args.value);
+                            if (!respond.result) {
+                                
+                            }
+                            
+                        },
+                        onValueChange_ctx: this,
+                        widgetLabelPostfix: ":"
+                    });
+
+                    groupLists[c.type.propertyGroups[i].id] = list;
                 }
-
-                var list = new $xcng.widgets.WidgetList({
-                    id: 'inputWidgetList_'+i+'_for_'+c.id, 
-                    containerElement: listHolder, 
-                    label: c.type.propertyGroups[i].label, 
-                    mode: 'INPUT', 
-
-                    quantities: quantities,
-                    propertyTypeDescriptors: propertyTypeDescriptors, 
-                    propertyInstanceDescriptors: [],
-                    
-                    onValueChange: function (args) {
-                        trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
-                    },
-                    onValueChange_ctx: this
-                });
-                
-                list.renderPropertyWidgets();
-
-                lists.push(list);
             }
+
+            for (var i in c.type._propertyTypes) {
+                var pt = c.type._propertyTypes[i];
+                if (pt.inspectable && pt.protoName == "VariableType") {
+                    var descriptor = c.getPropertyInstanceDescriptor(pt.id);
+                    if (pt.parentPropertyType) {
+                        groupLists[pt.parentPropertyType.id].propertyInstanceDescriptors = groupLists[pt.parentPropertyType.id].propertyInstanceDescriptors || [];
+                        groupLists[pt.parentPropertyType.id].propertyInstanceDescriptors.push(descriptor);
+                    } else {
+                        freeList.propertyInstanceDescriptors = freeList.propertyInstanceDescriptors || [];
+                        freeList.propertyInstanceDescriptors.push(descriptor);
+                    }
+                }
+            }
+
+            freeList.renderPropertyWidgets();
+
+            for (var i in groupLists) {
+                var list = groupLists[i];
+                list.renderPropertyWidgets();
+            }
+
+            groupLists["__0__"] = freeList;
+
+            this.propertyLists = groupLists;
+
+            this.inspectedComponent = c;
 
             panel.show();
 

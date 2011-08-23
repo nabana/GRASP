@@ -5,6 +5,8 @@
  * 
  * .draggable:		100000
  * 
+ * .context-menu:   1000
+ *
  * .panel:			250
  * #inventory:		240
  * #description:	230
@@ -449,12 +451,13 @@ div.clock {
 
 .context-menu {
     display:none;
-    width:200px;
+    width:240px;
     background-color:white;
     border:1px solid black;
     padding:5px;
     position: absolute;
-    font-size: 12px;
+    font-size: 11px;
+    z-index: 1000;
 }
 
 #propertiesPanel .content {
@@ -463,4 +466,22 @@ div.clock {
 
 .widgetsListLabel {
     font-weight: bold;
+}
+
+.widgetsList .labelContainer {
+    text-align: right;
+    width: 70px;
+}
+
+.widgetsList .controlContainer {
+    width: 100px;
+}
+
+.unit {
+    margin-left: 2px;
+}
+
+.widgetsList {
+    width: 100%;
+    margin-bottom: 5px;
 }
