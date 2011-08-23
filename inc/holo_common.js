@@ -258,9 +258,6 @@ HoloComponentLibrary.prototype = {
             hct.parentLibrary = this;
             hct.initFromJSONObj(jsonObj.componentTypes[0].componentType[i]);
             this.componentTypes[hct.id] = hct;
-
-            this.propertyTypeDescriptors[hct.id] = hct.getDescriptor();
-
         }
 
         this.loaded = true;
@@ -351,15 +348,16 @@ PropertyType.prototype = {
     group: null,
     inspectable: true,
 
-    widgetType: null,
-    widgetParameters: null,
+    descriptor: null,
+
+    readonly: false,
 
     initFromJSONObj: function(jsonObj){
         this.id = jsonObj["@id"];
         this.label = jsonObj["@label"];
         this.customConstrainResolver = jsonObj["@customConstrainResolver"];
         if (jsonObj["description"] && jsonObj["description"].length){
-            this.description = jsonObj["description"][0];
+            this.description = jsonObj["description"][0]["Text"];
         }
         this.dictionary = new Dictionary();
         if (jsonObj["dictionary"] && jsonObj["dictionary"].length){
@@ -372,23 +370,42 @@ PropertyType.prototype = {
 
         if (jsonObj["@inspectable"] && jsonObj["@inspectable"] == "false") this.inspectable = false;
 
-        if (jsonObj["widget"] && jsonObj["widget"].length){
-            this.widgetType = jsonObj["widget"][0]["@type"];
-            
-            if (jsonObj["widget"][0]["parameters"] && jsonObj["widget"][0]["parameters"].length &&
-                jsonObj["widget"][0]["parameters"][0]["parameter"] && jsonObj["widget"][0]["parameters"][0]["parameter"].length) {
-                this.widgetParameters = this.widgetParameters || {};
-
-                for (var i = 0; i < jsonObj["widget"][0]["parameters"][0]["parameter"].length; i++){
-                    var a = jsonObj["widget"][0]["parameters"][0]["parameter"][i];
-                    this.widgetParameters[a["@id"]] = a["Text"];
-                }
-            }
-        }
+        if (jsonObj["@readonly"] && jsonObj["@readonly"] == "true") this.readonly = true;
 
         if (this.parentComponentType && this.id){
             this.parentComponentType.registerPropertyType(this);
         }
+
+        // assembling descriptor
+
+        var widgetType, widgetParameters;
+
+        if (jsonObj["widget"] && jsonObj["widget"].length){
+            widgetType = jsonObj["widget"][0]["@type"];
+            
+            if (jsonObj["widget"][0]["parameters"] && jsonObj["widget"][0]["parameters"].length &&
+                jsonObj["widget"][0]["parameters"][0]["parameter"] && jsonObj["widget"][0]["parameters"][0]["parameter"].length) {
+                widgetParameters = {};
+
+                for (var i = 0; i < jsonObj["widget"][0]["parameters"][0]["parameter"].length; i++){
+                    var a = jsonObj["widget"][0]["parameters"][0]["parameter"][i];
+                    widgetParameters[a["@id"]] = a["Text"];
+                }
+            }
+        }
+
+        this.descriptor = {
+            id: this.id,
+            readonly: this.readonly,
+            widget: widgetType,
+            widgetParameters: widgetParameters,
+            label: this.label,
+            description: this.description,
+            defaultValue: this.defaultValue,
+            multiple: this.multiple,
+            possibleValues: this.possibleValues
+        }
+
     },
 
     createInstance: function(id){
@@ -703,20 +720,42 @@ function VariableType(defaultValue){
 
 VariableType.prototype = {
     protoName: "VariableType",
-    quantity: null,
+    quantityId: null,
     bindToSkinAttribute: null,
     valueType: null,
+    possibleValues: null,
 }
 
 $.extend(VariableType.prototype, PropertyType.prototype);
 
 VariableType.prototype.initFromJSONObj = function(jsonObj){
+
     PropertyType.prototype.initFromJSONObj.call(this, jsonObj);
 
     this.bindToSkinAttribute = jsonObj["@bindToSkinAttribute"];
-    this.valueType = jsonObj["@valueType"];
+
+    if (jsonObj["@quantity"]) {
+        this.quantityId = jsonObj["@quantity"];
+        this.descriptor.quantityId = this.quantityId;
+    }
+
+    if (jsonObj["possibleValues"] && jsonObj["possibleValues"].length &&
+        jsonObj["possibleValues"][0]["value"] && jsonObj["possibleValues"][0]["value"].length) {
+        this.possibleValues = {};
+
+        for (var i = 0; i < jsonObj["possibleValues"][0]["value"].length; i++){
+            var a = jsonObj["possibleValues"][0]["value"][i];
+            this.possibleValues[a["@key"]] = a["Text"];
+        }
+
+        this.descriptor.possibleValues = this.possibleValues;
+    }
+
+
     if (jsonObj["@defaultValue"]){
         this.defaultValue = jsonObj["@defaultValue"];
+
+        this.descriptor.defaultValue = this.defaultValue;
     }
     
     this.parentComponentType.propertyBindingsToSkinAttributes = this.parentComponentType.propertyBindingsToSkinAttributes || {};
@@ -724,6 +763,7 @@ VariableType.prototype.initFromJSONObj = function(jsonObj){
     if (isSet(this.bindToSkinAttribute)) {
         this.parentComponentType.propertyBindingsToSkinAttributes[this.bindToSkinAttribute] = this.id;
     }
+
 }
 
 /*
@@ -1028,6 +1068,18 @@ HoloComponentType.prototype = {
         this._propertyTypes[propertyType.id] = propertyType;
     },
 
+    getPropertyDescriptors: function() {
+        var propertyTypeDescriptors = {};
+
+        for (var i in this._propertyTypes) {
+            if (this._propertyTypes[i].inspectable) {
+                propertyTypeDescriptors[i] = this._propertyTypes[i].descriptor;
+            }
+        }
+
+        return propertyTypeDescriptors;
+    },
+
     initFromJSONObj: function(jsonObj){
         this.id = jsonObj["@id"];
         this.label = jsonObj["@label"];
@@ -1074,10 +1126,6 @@ HoloComponentType.prototype = {
         }
 
 
-    },
-
-    getDescriptor: function () {
-        return {};
     },
 
     initFromXML: function(xml){

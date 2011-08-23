@@ -267,7 +267,7 @@ GRASPPlayer.prototype = {
 
             var quantities = this.libraryManager.getQuantities();
 
-            var propertyTypeDescriptors = c.type.propertyTypeDescriptors;
+            var propertyTypeDescriptors = c.type.getPropertyDescriptors();
 
             for (var i in c.type.propertyGroups) {
                 
@@ -289,7 +289,7 @@ GRASPPlayer.prototype = {
                     mode: 'INPUT', 
 
                     quantities: quantities,
-                    propertyTypeDescriptors: [], 
+                    propertyTypeDescriptors: propertyTypeDescriptors, 
                     propertyInstanceDescriptors: [],
                     
                     onValueChange: function (args) {
