@@ -57,7 +57,6 @@ $xcng.widgets.WidgetList.prototype = {
                     
                     if (this.label) {
                         this.labelElement = $('<div/>', {
-                            id: this.id='label',
                             'class': 'widgetsListLabel',
                             text: this.label
                         });

@@ -454,4 +454,13 @@ div.clock {
     border:1px solid black;
     padding:5px;
     position: absolute;
+    font-size: 12px;
+}
+
+#propertiesPanel .content {
+    text-align: left;
+}
+
+.widgetsListLabel {
+    font-weight: bold;
 }

@@ -70,8 +70,18 @@ LibraryManager.prototype = {
                 if (result != term_id) break;
             }
         }
-
         return result;
+    },
+
+
+    getQuantities: function () {
+        var quantities = {};
+
+        for (var i in this._libraries) {
+            $.extend(quantities, this._libraries[i].quantities);
+        }
+    
+        return quantities;
     },
 
 
@@ -197,6 +207,7 @@ HoloComponentLibrary.prototype = {
     componentTypes: null,
     // associative arry of quantities
     quantities: null,
+    propertyTypeDescriptors: null,
 
     loaded: false,
     initialized: false,
@@ -240,11 +251,16 @@ HoloComponentLibrary.prototype = {
 
         this.componentTypes = {};
 
+        this.propertyTypeDescriptors = {};  // for widgets
+
         for (i = 0; i < jsonObj.componentTypes[0].componentType.length; i++){
             var hct = new HoloComponentType();
             hct.parentLibrary = this;
             hct.initFromJSONObj(jsonObj.componentTypes[0].componentType[i]);
             this.componentTypes[hct.id] = hct;
+
+            this.propertyTypeDescriptors[hct.id] = hct.getDescriptor();
+
         }
 
         this.loaded = true;
@@ -335,12 +351,12 @@ PropertyType.prototype = {
     group: null,
     inspectable: true,
 
+    widgetType: null,
+    widgetParameters: null,
+
     initFromJSONObj: function(jsonObj){
         this.id = jsonObj["@id"];
         this.label = jsonObj["@label"];
-        if (jsonObj["widget"] && jsonObj["widget"].length){
-            this.widget = jsonObj["widget"][0];
-        }
         this.customConstrainResolver = jsonObj["@customConstrainResolver"];
         if (jsonObj["description"] && jsonObj["description"].length){
             this.description = jsonObj["description"][0];
@@ -355,6 +371,20 @@ PropertyType.prototype = {
         }
 
         if (jsonObj["@inspectable"] && jsonObj["@inspectable"] == "false") this.inspectable = false;
+
+        if (jsonObj["widget"] && jsonObj["widget"].length){
+            this.widgetType = jsonObj["widget"][0]["@type"];
+            
+            if (jsonObj["widget"][0]["parameters"] && jsonObj["widget"][0]["parameters"].length &&
+                jsonObj["widget"][0]["parameters"][0]["parameter"] && jsonObj["widget"][0]["parameters"][0]["parameter"].length) {
+                this.widgetParameters = this.widgetParameters || {};
+
+                for (var i = 0; i < jsonObj["widget"][0]["parameters"][0]["parameter"].length; i++){
+                    var a = jsonObj["widget"][0]["parameters"][0]["parameter"][i];
+                    this.widgetParameters[a["@id"]] = a["Text"];
+                }
+            }
+        }
 
         if (this.parentComponentType && this.id){
             this.parentComponentType.registerPropertyType(this);
@@ -1006,6 +1036,7 @@ HoloComponentType.prototype = {
             this.description = jsonObj["description"][0]["Text"];
         }
 
+
         if (jsonObj["@internal"] && jsonObj["@internal"] == "true") this.internal = true;
         if (jsonObj["@inspectable"] && jsonObj["@inspectable"] == "false") this.inspectable = false;
         this.skinURL = this.parentLibrary.baseURL + "/" + jsonObj["@skinURL"];
@@ -1043,6 +1074,10 @@ HoloComponentType.prototype = {
         }
 
 
+    },
+
+    getDescriptor: function () {
+        return {};
     },
 
     initFromXML: function(xml){
@@ -1120,7 +1155,7 @@ function Quantity(){}
 
 Quantity.prototype = {
     id: null,
-    possibleUnits: null,
+    units: null,
     baseUnit: null,
     symbol: null,
 
@@ -1128,14 +1163,14 @@ Quantity.prototype = {
         this.id = jsonObj["@id"];
         this.symbol = jsonObj["@symbol"];
 
-        this.possibleUnits = {};
+        this.units = {};
 
         for (var i = 0; i < jsonObj.units[0].unit.length; i++){
             var unit = new Unit();
             unit.initFromJSONObj(jsonObj.units[0].unit[i]);
-            this.possibleUnits[unit.id] = unit;
+            this.units[unit.id] = unit;
 
-            if (unit.isBase) this.baseUnit = unit;
+            if (unit.isBase) this.baseUnit = unit.id;
         }
 
         trace("Quantity [" + this.id + "] is initialized.");

@@ -179,10 +179,11 @@ function GRASPPlayer(initObj){
    // $.contextMenu.shadow = false;
 
     $('body').bind('contextmenu',function(){
-        window.player.removePropertiesPanel();
+      //  window.player.removePropertiesPanel();
         return false;
     });
     
+//    $(document).one('click',null,function(){window.player.removePropertiesPanel()}); 
 
     trace("GRASPPlayer " + this.version + " created.");
 }
@@ -217,18 +218,17 @@ GRASPPlayer.prototype = {
         trace(msg);
     },
 
-    removePropertiesPanel: function() {
-        if (window.player.propertiesPanel) {
-            trace("hide"); // HERE
-            window.player.tobeRemovedPropertiesPanel = window.player.propertiesPanel;
-            window.player.propertiesPanel.hide(.3, function(){
-               $(this).remove();
-            });
+    removePropertiesPanel: function(panel) {
+        if (!panel) panel = window.player.propertiesPanel;
+        if (panel) {
+            trace("in removePropertiesPanel"); // HERE
+            panel.hide();
         }
     },
 
-    renderPropertiesPanelFor: function(id) {
+    renderPropertiesPanelFor: function(id, where) {
 
+        trace("in renderPropertiesPanel");
         var c = window.holoComponentManager.getComponentById(id);
 
         if (c && c.type.inspectable) {
@@ -236,38 +236,77 @@ GRASPPlayer.prototype = {
             var panel = $('<div/>', {
                 'class': 'context-menu',
                 id: 'propertiesPanel',
-                text: 'Ehh'
             });
+
+            var panelContent = $('<div/>', {
+                'class': 'content',
+            });
+
+            panel.append(panelContent);
 
             $('body').append(panel);
 
-            var offset = c.skinInstance.offset();
-            var cWidth = c.skinInstance.outerWidth(true);
+            var offset = where;
             var pWidth = panel.width();
-
-            c.skinInstance.find('.skinWrapper').children().each(function() {
-                cWidth += $(this).outerWidth( true );
-            });
-
-            trace(cWidth);
 
             var left = 0;
             var top = offset.top;
 
-            if (offset.left+cWidth+pWidth > $(document).width()) {
+            if (offset.left+pWidth > $(document).width()) {
                 left = offset.left - pWidth;
             } else {
-                left = offset.left+cWidth;
+                left = offset.left;
             }
 
             panel.css('left', left);
             panel.css('top', top);
 
+            // here comes the content
+            
+            var lists = [];
+
+            var quantities = this.libraryManager.getQuantities();
+
+            var propertyTypeDescriptors = c.type.propertyTypeDescriptors;
+
+            for (var i in c.type.propertyGroups) {
+                
+                var listHolder = $('<div/>', {
+                    'class': 'listHolder',
+                });
+                
+                panelContent.append(listHolder);
+
+
+                for (var j = 0; j < c.type.propertyGroups[i].members.length; j++) {
+                    
+                }
+
+                var list = new $xcng.widgets.WidgetList({
+                    id: 'inputWidgetList_'+i+'_for_'+c.id, 
+                    containerElement: listHolder, 
+                    label: c.type.propertyGroups[i].label, 
+                    mode: 'INPUT', 
+
+                    quantities: quantities,
+                    propertyTypeDescriptors: [], 
+                    propertyInstanceDescriptors: [],
+                    
+                    onValueChange: function (args) {
+                        trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
+                    },
+                    onValueChange_ctx: this
+                });
+                
+                list.renderPropertyWidgets();
+
+                lists.push(list);
+            }
+
             panel.show();
 
             this.propertiesPanel = panel;
 
-            trace("show");
 
         }
 
@@ -530,6 +569,9 @@ GRASPPlayer.prototype = {
 
     setSelection: function(ids, addToExistingSelection, record){
 
+        var oldPanel = window.player.propertiesPanel;
+        window.player.removePropertiesPanel(oldPanel);
+
         var changed = false;
 
         if (addToExistingSelection !== true && window.player.selectedComponents && window.player.selectedComponents.length){
@@ -658,6 +700,7 @@ GRASPPlayer.prototype = {
 
     on_component_mousedown: function(e){
         e.stopPropagation();
+
         if (window.player.allowSelecting){
             var id = $(e.currentTarget).attr('id');
             window.player.selectedComponentIds = window.player.selectedComponentIds || [];
@@ -665,12 +708,20 @@ GRASPPlayer.prototype = {
               window.holoComponentManager.operationManager.recordOperation("Change selection");
               var res = window.player.setSelection([id], e.shiftKey );
               window.holoComponentManager.operationManager.finishRecording(res);
-            }           
+
+              if (!res) {
+                  window.player.removePropertiesPanel();
+              }
+
+            } else {
+                  window.player.removePropertiesPanel();                
+            }
 
             if (e.which == 3) {
-                window.player.renderPropertiesPanelFor(id);
+               
+                window.player.renderPropertiesPanelFor(id, {left: e.pageX, top:e.pageY});
             }
-        }
+        }        
     },
 
     // getters/setters

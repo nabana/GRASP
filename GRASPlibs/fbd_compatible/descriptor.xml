@@ -109,8 +109,7 @@
                         <variable id="MagnitudeFuzz" label="Magnitude fuzziness" defaultValue="0">
                             <widget type="TextField">
                                 <parameters>
-                                    <width>40</width>
-                                    <afterDecimal>0</afterDecimal>
+                                    <parameter id="width">40</parameter>
                                 </parameters>
                             </widget> 
                         </variable>
@@ -123,39 +122,40 @@
                 <variable id="Type" defaultValue="N">
                     <widget type="DropDown">
                         <parameters>
-                            <width>100</width>
-                            <optionsProvider><![CDATA[
-                                var vectorTypes = [ 'Undefined',
-                                                    'Weight',
-                                                    'Electrical Force',
-                                                    'Magnetic Force',
-                                                    'Applied Force',
-                                                    'Tension',
-                                                    'Muscle Force',
-                                                    'Normal Force',
-                                                    'Friction Force',
-                                                    'General Reaction Force',
-                                                    'GRF, Horizontal Component',
-                                                    'GRF, Vertical Component',
-                                                    'Joint Reaction Force',
-                                                    'JRF, Horizontal Component',
-                                                    'JRF, Vertical Component' ];
-                            
-                                var vectorCodes = ['U', 'W', 'E', 'M', 'F', 'T', 'L', 'N', 'ff', 'R', 'Rx', 'Ry', 'J', 'Jx', 'Jy'];
-
-                                var result = {};
-
-                                for (var i=0; i<vectorCodes.length; i++) {
-                                    result[vectorCodes[i]] = vectorTypes[i];
-                                }
-
-                                return result;
-                            ]]></optionsProvider>
+                            <parameter id="width">100</parameter>
                         </parameters>
                     </widget>
+                    <possibleValuesProvider><![CDATA[
+                        var vectorTypes = [ 'Undefined',
+                                            'Weight',
+                                            'Electrical Force',
+                                            'Magnetic Force',
+                                            'Applied Force',
+                                            'Tension',
+                                            'Muscle Force',
+                                            'Normal Force',
+                                            'Friction Force',
+                                            'General Reaction Force',
+                                            'GRF, Horizontal Component',
+                                            'GRF, Vertical Component',
+                                            'Joint Reaction Force',
+                                            'JRF, Horizontal Component',
+                                            'JRF, Vertical Component' ];
+                    
+                        var vectorCodes = ['U', 'W', 'E', 'M', 'F', 'T', 'L', 'N', 'ff', 'R', 'Rx', 'Ry', 'J', 'Jx', 'Jy'];
+
+                        var result = {};
+
+                        for (var i=0; i<vectorCodes.length; i++) {
+                            result[vectorCodes[i]] = vectorTypes[i];
+                        }
+
+                        return result;
+                    ]]></possibleValuesProvider>
+                    
                 </variable>
 
-                <group id="visualProperties" label="Direction">
+                <group id="Direction" label="Direction">
                 	<members>
 		                <variable id="Direction" quantity="Direction" label="Rot" bindToSkinAttribute="vectorRotation"  defaultValue="0">
 		                    <description>
@@ -171,16 +171,14 @@
 							<!-- </constraints>-->
                             <widget type="TextField">
                                 <parameters>
-                                    <width>140</width>
-                                    <afterDecimal>2</afterDecimal>
+                                    <parameter id="width">100</parameter>
                                 </parameters>
                             </widget>
 		                </variable>
                         <variable id="DirectionFuzz" label="Direction fuzziness" defaultValue="3">
                             <widget type="TextField">
                                 <parameters>
-                                    <width>40</width>
-                                    <afterDecimal>0</afterDecimal>
+                                    <parameter id="width">100</parameter>
                                 </parameters>
                             </widget>                        
                         </variable>
@@ -198,8 +196,7 @@
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <width>140</width>
-                                    <afterDecimal>0</afterDecimal>
+                                    <parameter id="width">100</parameter>
                                 </parameters>
                             </widget>
 		                </variable>
@@ -209,8 +206,7 @@
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <width>140</width>
-                                    <afterDecimal>0</afterDecimal>
+                                    <parameter id="width">100</parameter>
                                 </parameters>
                             </widget>                            
 		                </variable>
@@ -220,7 +216,7 @@
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <width>140</width>
+                                    <parameter id="width">100</parameter>
                                     <afterDecimal>0</afterDecimal>
                                 </parameters>
                             </widget>                            
@@ -231,7 +227,7 @@
 		                    </description>
                             <widget type="TextField">
                                 <parameters>
-                                    <width>140</width>
+                                    <parameter id="width">100</parameter>
                                     <afterDecimal>0</afterDecimal>
                                 </parameters>
                             </widget>                            
@@ -245,8 +241,7 @@
 							<!-- </constraints>-->
                             <widget type="TextField">
                                 <parameters>
-                                    <width>140</width>
-                                    <afterDecimal>2</afterDecimal>
+                                    <parameter id="width">100</parameter>
                                 </parameters>
                             </widget>
                         </variable>
