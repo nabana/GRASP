@@ -454,7 +454,7 @@ div.clock {
     width:240px;
     background-color:white;
     border:1px solid black;
-    padding:5px;
+    padding:0px;
     position: absolute;
     font-size: 11px;
     z-index: 1000;
@@ -483,5 +483,18 @@ div.clock {
 
 .widgetsList {
     width: 100%;
+    margin-bottom: 5px;
+}
+
+.listHolder {
+    padding: 4px;
+}
+
+.context-menu .title {
+    font-weight: bold;
+    font-size: 12px;
+    color: white;
+    background-color: #333;
+    padding: 3px;
     margin-bottom: 5px;
 }

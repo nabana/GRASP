@@ -277,6 +277,7 @@ GRASPPlayer.prototype = {
 
             var listHolder = $('<div/>', {
                 'class': 'listHolder',
+                html: '<div class="title">Properties of '+c.type.label+'</div>',
             });
 
 
