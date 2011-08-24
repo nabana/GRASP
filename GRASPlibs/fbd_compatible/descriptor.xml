@@ -32,7 +32,7 @@
         </quantity>
     </quantities>
     <componentTypes>
-        <componentType id="RootComponentType" skinURL="root.html" internal="true" inspectable="true">
+        <componentType id="RootComponentType" skinURL="root.html" internal="true" inspectable="true" label="Canvas">
             <properties>
                 <!-- <variable id="Instructions" label="Instructions"> -->
                 <!-- </variable> -->
@@ -54,7 +54,37 @@
 						</reference>
 					</memberType>
                 </set>
-				<group id="controlProperties">
+				<variable id="BgImage" label="Image" inspectable="true" bindToSkinAttribute="BgImage" >
+					<description>
+						Background of the canvas
+					</description>
+                    <widget type="TextField">
+                        <parameters>
+                            <parameter id="width">140</parameter>
+                        </parameters>
+                    </widget>                     
+				</variable>
+				<variable id="Author" label="Author" inspectable="true" >
+					<description>
+						Author of the diagram
+					</description>
+                    <widget type="TextField">
+                        <parameters>
+                            <parameter id="width">140</parameter>                            
+                        </parameters>
+                    </widget>                     
+				</variable>
+				<variable id="Instructions" label="Instructions" inspectable="true" bindToSkinAttribute="Instructions" >
+					<description>
+						Instructions for the problem
+					</description>
+                    <widget type="TextArea">
+                    </widget>                     
+				</variable>
+                
+				<variable id="ScaleFactor" label="Scale factor" inspectable="false" defaultValue="1"/>
+                   
+				<group id="controlProperties" inspectable="false">
 					<members>
 						<variable id="selectable" defaultValue="false"/>
 						<variable id="droppable" defaultValue="true"/>						

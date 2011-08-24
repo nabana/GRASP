@@ -185,9 +185,9 @@ function GRASPPlayer(initObj){
 
     $(document).keydown(function(e) {
         //trace(e.which);           
-        e.preventDefault();
-        e.stopPropagation();
         if (e.which == 8 || e.which == 46) {
+            e.preventDefault();
+            e.stopPropagation();
 
             if (window.player.selectedComponents) {
                 
@@ -205,8 +205,10 @@ function GRASPPlayer(initObj){
 
                 window.holoComponentManager.operationManager.finishRecording(response.result);                
             }
+
+            return false;
         }
-        return false;
+        return true;
     });
 
 
@@ -220,9 +222,9 @@ GRASPPlayer.prototype = {
 
     version: "1.0",
     _state: null,
-    _diagramDescriptor: null,
+    configDescriptor: null,
     _canvas: null,
-    _diagramDescriptorURL: null,
+    configDescriptorURL: null,
     _mode: "MODE_COMPOSE",
     rootComponent: null,
     inventoryDisplay: null,
@@ -271,10 +273,22 @@ GRASPPlayer.prototype = {
 
         if (c && c.type.inspectable) {
             // setting up new propertiespanel
+            
+            var symbolTxt = c.getPropertyValue('symbol');
+            var screenIdTxt = c.getPropertyValue('screenId');
+            
+            var titleTxt;
+
+            if (symbolTxt || screenIdTxt) {
+                titleTxt = '<div class="title">Properties of '+c.type.label+' ['+(symbolTxt?symbolTxt:"")+(screenIdTxt?screenIdTxt:"")+']</div>';
+            } else {
+                titleTxt = '<div class="title">Properties of '+c.type.label+'</div>';
+            }
+
             var panel = $('<div/>', {
                 'class': 'context-menu',
                 id: 'propertiesPanel',
-                html: '<div class="title">Properties of '+c.type.label+' ['+c.getPropertyValue('symbol')+c.getPropertyValue('screenId')+']</div>',
+                html: titleTxt,
             });
 
             var panelContent = $('<div/>', {
@@ -373,7 +387,6 @@ GRASPPlayer.prototype = {
             for (var i in c.type.propertyGroups) {
                 if (c.type.propertyGroups[i].inspectable) {
                     
-                    panelContent.append(listHolder);
 
                     var list = new $xcng.widgets.WidgetList({
                         id: 'inputWidgetList_'+i+'_for_'+c.id+'_'+c.type.propertyGroups[i].id, 
@@ -408,6 +421,8 @@ GRASPPlayer.prototype = {
                     groupLists[c.type.propertyGroups[i].id] = list;
                 }
             }
+
+            panelContent.append(listHolder);
 
             for (var i in c.type._propertyTypes) {
                 var pt = c.type._propertyTypes[i];
@@ -454,21 +469,21 @@ GRASPPlayer.prototype = {
 
     parseDiagramDescriptor: function(xml){
 
-        var _diagramDescriptor_JSON = $.xmlToJSON(xml);
-        this._diagramDescriptor = new GRASPDiagramDescriptior;
+        var configDescriptor_JSON = $.xmlToJSON(xml);
+        this.configDescriptor = new GRASPDiagramDescriptior;
 
-        this._diagramDescriptor.libraryLocation = _diagramDescriptor_JSON["@libraryLocation"];
-        this._diagramDescriptor.isTimed = _diagramDescriptor_JSON["@isTimed"];
-        this._diagramDescriptor.availableTime = _diagramDescriptor_JSON["@availableTime"];
-        this._diagramDescriptor.title = _diagramDescriptor_JSON["@title"];
-        if (_diagramDescriptor_JSON["description"] && _diagramDescriptor_JSON["description"].lenght) this._diagramDescriptor.description = _diagramDescriptor_JSON["description"][0]["Text"];
-        this._diagramDescriptor.showGrid = _diagramDescriptor_JSON["@showGrid"];
-        this._diagramDescriptor.showInventory = _diagramDescriptor_JSON["@showInventory"];
+        this.configDescriptor.libraryLocation = configDescriptor_JSON["@libraryLocation"];
+        this.configDescriptor.isTimed = configDescriptor_JSON["@isTimed"];
+        this.configDescriptor.availableTime = configDescriptor_JSON["@availableTime"];
+        this.configDescriptor.title = configDescriptor_JSON["@title"];
+        if (configDescriptor_JSON["description"] && configDescriptor_JSON["description"].lenght) this.configDescriptor.description = configDescriptor_JSON["description"][0]["Text"];
+        this.configDescriptor.showGrid = configDescriptor_JSON["@showGrid"];
+        this.configDescriptor.showInventory = configDescriptor_JSON["@showInventory"];
 
-        if (_diagramDescriptor_JSON["inventory"] && _diagramDescriptor_JSON["inventory"][0] && _diagramDescriptor_JSON["inventory"][0]["item"] && _diagramDescriptor_JSON["inventory"][0]["item"].length){
-            this._diagramDescriptor.inventory = [];
-            for (var i = 0; i < _diagramDescriptor_JSON["inventory"][0]["item"].length; i++){
-                this._diagramDescriptor.inventory.push(_diagramDescriptor_JSON["inventory"][0]["item"][i]["@componentType"]);
+        if (configDescriptor_JSON["inventory"] && configDescriptor_JSON["inventory"][0] && configDescriptor_JSON["inventory"][0]["item"] && configDescriptor_JSON["inventory"][0]["item"].length){
+            this.configDescriptor.inventory = [];
+            for (var i = 0; i < configDescriptor_JSON["inventory"][0]["item"].length; i++){
+                this.configDescriptor.inventory.push(configDescriptor_JSON["inventory"][0]["item"][i]["@componentType"]);
             }
         }
 
@@ -480,27 +495,27 @@ GRASPPlayer.prototype = {
     },
 
     exportDiagramAsXML: function(){
-        if (this._diagramDescriptor){
-            return this._diagramDescriptor.exportToXML();
+        if (this.configDescriptor){
+            return this.configDescriptor.exportToXML();
         }
     },
 
-    loadDiagramDescriptorFromURL: function(url){
-        this._diagramDescriptorURL = url;
+    loadConfigDescriptorFromURL: function(url){
+        this.configDescriptorURL = url;
         this.state = GRASPPlayer.STATE_INITIALIZING
 
-        trace("GRASPPlayer initializing with [" + this._diagramDescriptorURL + "]...");
+        trace("GRASPPlayer initializing with [" + this.configDescriptorURL + "]...");
 
         var _config = new ProcessableXML();
 
         _config.processor = this.parseDiagramDescriptor;
         _config.postLoading = this.on_configLoaded;
         _config.context = this;
-        _config.loadContent(this._diagramDescriptorURL);
+        _config.loadContent(this.configDescriptorURL);
     },
 
-    loadDiagramDescriptorFromXMLText: function(xmlText){
-        this._diagramDescriptorURL = null;
+    loadConfigDescriptorFromXMLText: function(xmlText){
+        this.configDescriptorURL = null;
         this.state = GRASPPlayer.STATE_INITIALIZING
 
         trace("GRASPPlayer initializing from an XML");
@@ -565,7 +580,7 @@ GRASPPlayer.prototype = {
         if (this.exitBState == 1){
             menu.append("<li id='exitButton'><a href='javascript:window.player.on_exitButton_click();' title='Exit'>Exit</a></li>")
         }
-        if (this._diagramDescriptor.isTimed == "true"){
+        if (this.configDescriptor.isTimed == "true"){
             menu.append("<li class='clock'>" + this.clock.getHTML() + "</li>");
         }
     },
@@ -578,21 +593,21 @@ GRASPPlayer.prototype = {
     },
 
     initClock: function(){
-        if (this._diagramDescriptor.isTimed == "true" && isSet(this._diagramDescriptor.availableTime)){
-            this.clock = new Clock(this._diagramDescriptor.availableTime);
+        if (this.configDescriptor.isTimed == "true" && isSet(this.configDescriptor.availableTime)){
+            this.clock = new Clock(this.configDescriptor.availableTime);
         }
     },
 
     refreshTitle: function(){
         $("#title").empty();
-        $("#title").append(this._diagramDescriptor.title);
+        $("#title").append(this.configDescriptor.title);
         //$("#title").disableSelection();	
     },
 
     refreshDescription: function(){
         $("#description").empty();
-        if (this._diagramDescriptor.description != undefined){
-            $("#description").append(this._diagramDescriptor.description);
+        if (this.configDescriptor.description != undefined){
+            $("#description").append(this.configDescriptor.description);
         }
 
         //$("#description").disableSelection();
@@ -629,7 +644,7 @@ GRASPPlayer.prototype = {
                 control.attr("src", "assets/hide_off.png");
             });
 
-            window.player._diagramDescriptor.showInventory == "true";
+            window.player.configDescriptor.showInventory == "true";
 
         } else{
             var inventory = $("#inventory");
@@ -653,7 +668,7 @@ GRASPPlayer.prototype = {
                 control.attr("src", "assets/show_off.png");
             });
 
-            window.player._diagramDescriptor.showInventory == "false";
+            window.player.configDescriptor.showInventory == "false";
         }
     },
 
@@ -685,7 +700,7 @@ GRASPPlayer.prototype = {
         var hasInventory = this.inventoryDisplay.render();
 
         /*		if (inventoryHTML) {
-			if (this._diagramDescriptor.showInventory == "true") {
+			if (this.configDescriptor.showInventory == "true") {
 				this.toggleInventory(true);			
 			} else {
 				this.toggleInventory(false);
@@ -770,7 +785,7 @@ GRASPPlayer.prototype = {
 
             var library = new GRASPComponentLibrary();
             library.libraryManager = this.libraryManager;
-            library.loadFromURL(this._diagramDescriptor.libraryLocation);
+            library.loadFromURL(this.configDescriptor.libraryLocation);
 
         } else{
             this.halt();
@@ -864,9 +879,10 @@ GRASPPlayer.prototype = {
     },
 
     on_component_mouseup: function(e){
-        //e.stopPropagation();
 
         if (e.which == 3) {
+           e.stopPropagation();
+            
             var id = $(e.currentTarget).attr('id');
 
             window.player.renderPropertiesPanelFor(id);

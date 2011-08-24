@@ -539,3 +539,8 @@ div.clock {
 .invalid input, .invalid select, .invalid textarea {
     color: red;
 }
+
+.propertyValue.TextArea {
+    width: 140px;
+    height: 80px;
+}

@@ -4,12 +4,12 @@
 		
 		this.skinInstance.disableSelection();
 		
-		this.skinInstance.css("width", "960px");
-		this.skinInstance.css("height", "470px");
+		this.skinInstance.css("width", "950px");
+		this.skinInstance.css("height", "410px");
 		this.skinInstance.css("top", "50px");		
 		
 		window.player.mainCanvas = $('.mainCanvas');
-		if (window.player._diagramDescriptor.showGrid == "true") {
+		if (window.player.configDescriptor.showGrid == "true") {
 			window.player.mainCanvas.addClass('gridded');
 		}
 	

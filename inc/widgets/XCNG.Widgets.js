@@ -199,6 +199,12 @@ $xcng.widgets.PropertyWidget.prototype = {
 
         this.skin.data('host', this);
 
+        this.skin.keydown(function(e) {
+            if (e.which == 8 || e.which == 46) {
+                e.stopPropagation();
+            }
+        });
+
         if (this.containerElement) {
             this.controlContainer.empty();
             
