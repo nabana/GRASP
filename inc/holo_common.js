@@ -498,13 +498,13 @@ PropertyInstance.prototype = {
                     break;
 
                 default:
+                    if (this._parentComponent.skinAttributes) {
+                        var attributeDescriptor = this._parentComponent.skinAttributes[this.type.bindToSkinAttribute];
 
-                    var attributeDescriptor = this._parentComponent.skinAttributes[this.type.bindToSkinAttribute];
-
-                    if (attributeDescriptor && $.isFunction(attributeDescriptor.setValue)) {
-                        attributeDescriptor.setValue.call(this._parentComponent, this._value);
+                        if (attributeDescriptor && $.isFunction(attributeDescriptor.setValue)) {
+                            attributeDescriptor.setValue.call(this._parentComponent, this._value);
+                        }
                     }
-
                     break;
             }
         }

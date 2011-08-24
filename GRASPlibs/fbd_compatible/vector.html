@@ -69,8 +69,20 @@
 
                     if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.height();
                 }
-            }   
+            },
 
+            componentLabel: {
+
+                setValue: function (value) {
+
+                    /* trace("ehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"+value); */
+                    var type = this.getPropertyValue("Type");
+                    this.setPropertyValue("symbol", type, true)
+                    this.skinParts.label.html(type+"<span class='sub'>"+this.getPropertyValue("screenId")+"</span>");
+
+                },
+
+            }
         }
 	};
  

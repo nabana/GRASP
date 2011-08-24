@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GRASPDiagram title="Sample diagram" libraryLocation="GRASPlibs/fbd_compatible" isTimed="false" showGrid="true" showInventory="true">
-	<description>A bunny is running through the woods at a speed of 20 km/hour when he passes Jack on top of a hill.  If Jack takes off down the hill at the precise moment that the bunny crosses the base of the hill, could Jack ever catch up with the bunny?  Use the information given in the isolated diagram and the available inventory elements below to create the free body diagram to calculate your answer.  You have ten minutes to solve this problem.</description>
-	<inventory>
-		<item componentType="VectorType"/>
-		<item componentType="MomentType"/>
-	</inventory>		
   	<content>
   	</content>
 </GRASPDiagram>

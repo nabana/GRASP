@@ -32,11 +32,11 @@
         </quantity>
     </quantities>
     <componentTypes>
-        <componentType id="RootComponentType" skinURL="root.html" internal="true" inspectable="false">
+        <componentType id="RootComponentType" skinURL="root.html" internal="true" inspectable="true">
             <properties>
                 <!-- <variable id="Instructions" label="Instructions"> -->
                 <!-- </variable> -->
-                <set id="children" maxSize="10">
+                <set id="children" maxSize="100">
 					<dictionary>
 						<term id="SET_SIZE_EXCEEDED">Too many members.</term>		
 					</dictionary>
@@ -69,9 +69,10 @@
         	<dictionary>
         		<term id="WRONG_PLACE">This component can't really go there.</term>
         	</dictionary>
-        	<onCreation><![CDATA[
+=        	<onCreation><![CDATA[
 				if (!this.isDummy) {
 					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
+                    trace(this.getPropertyValue("screenId"));
 				}
 			]]></onCreation>
             <constraints>
@@ -97,7 +98,7 @@
 						Symbol of the component
 					</description>
 				</variable>
-				<variable id="screenId" label="Screen ID" defaultValue="x" readonly="true" inspectable="false">
+				<variable id="screenId" label="Screen ID" defaultValue="x" readonly="true" inspectable="false" bindToSkinAttribute="componentLabel" >
 					<description>
 						Screen ID of the component
 					</description>
@@ -130,7 +131,7 @@
                     </members>
                 </group>
 
-                <variable id="Type" defaultValue="U" label="Type">
+                <variable id="Type" defaultValue="U" label="Type"  bindToSkinAttribute="componentLabel">
                     <widget type="DropDown">
                         <parameters>
                             <parameter id="width">150</parameter>

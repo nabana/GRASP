@@ -185,6 +185,7 @@ function GRASPPlayer(initObj){
 
     $(document).keydown(function(e) {
         //trace(e.which);           
+        e.preventDefault();
         e.stopPropagation();
         if (e.which == 8 || e.which == 46) {
 
@@ -198,13 +199,14 @@ function GRASPPlayer(initObj){
 
                 for (var i=0; i <todelete.length; i++) {
                     var c = todelete[i];
-
+                    if (window.player.inspectedComponent == c) window.player.removePropertiesPanel();
                     var response = c.destruct(true);
                 }
 
                 window.holoComponentManager.operationManager.finishRecording(response.result);                
             }
         }
+        return false;
     });
 
 
@@ -459,7 +461,7 @@ GRASPPlayer.prototype = {
         this._diagramDescriptor.isTimed = _diagramDescriptor_JSON["@isTimed"];
         this._diagramDescriptor.availableTime = _diagramDescriptor_JSON["@availableTime"];
         this._diagramDescriptor.title = _diagramDescriptor_JSON["@title"];
-        this._diagramDescriptor.description = _diagramDescriptor_JSON["description"][0]["Text"];
+        if (_diagramDescriptor_JSON["description"] && _diagramDescriptor_JSON["description"].lenght) this._diagramDescriptor.description = _diagramDescriptor_JSON["description"][0]["Text"];
         this._diagramDescriptor.showGrid = _diagramDescriptor_JSON["@showGrid"];
         this._diagramDescriptor.showInventory = _diagramDescriptor_JSON["@showInventory"];
 
