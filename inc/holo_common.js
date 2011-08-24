@@ -487,12 +487,12 @@ PropertyInstance.prototype = {
         if (this._parentComponent && !this._parentComponent.ignoreBindings && this.type.bindToSkinAttribute) {
             switch (this.type.bindToSkinAttribute) {
                 case "positionX":
-                    this._parentComponent._setX(this._value);
+                    this._parentComponent._setX.call(this._parentComponent, this._value);
                     
                     break;
                 
                 case "positionY":
-                    this._parentComponent._setY(this._value);
+                    this._parentComponent._setY.call(this._parentComponent, this._value);
                                     
                     break;
 
@@ -1536,6 +1536,7 @@ HoloComponent.prototype = {
             this.presetPropertyValues = presetValues;
 
             var testResponse = this.testPresetPropertyValues();
+
             if (testResponse.result === true){
                 var response2 = this.usePresetProperyValues();
 
@@ -1594,7 +1595,13 @@ HoloComponent.prototype = {
 
 
     testPresetPropertyValues: function(){
-        return this.type.constraints.checkOn(this);
+        var response = this.type.constraints.checkOn(this);
+        
+        if ($.isFunction(this.on_testPresetPropertyValues)) {
+            this.on_testPresetPropertyValues.call(this, response);
+        }
+
+        return response;
     },
 
     tryToUsePresetProperyValues: function(){
@@ -1615,7 +1622,9 @@ HoloComponent.prototype = {
         }
 
         this.presetPropertyValues = {};
-        this.dispatchEvent("PROPERTYVALUES_CHANGED", this.id, changedPropertyIds);
+        //this.dispatchEvent("PROPERTYVALUES_CHANGED", this.id, changedPropertyIds);
+
+        
         return response;        
     },
 
@@ -1643,20 +1652,32 @@ HoloComponent.prototype = {
         }
 
         this.presetPropertyValues = {};
-        this.dispatchEvent("PROPERTYVALUES_CHANGED", this.id, changedPropertyIds);
+        //this.dispatchEvent("PROPERTYVALUES_CHANGED", this.id, changedPropertyIds);
         return response;        
     },
 
-    setPropertyValueForSkinAttributeInOperation: function(skinAttributId, operationId) {
+    setPropertyValueForSkinAttributeInOperation: function(skinAttributId) {
         var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributId];
 
         if (bindedPropertyId) {
+            var response = this.setPropertyValueInOperation(bindedPropertyId, this.skinAttributes[skinAttributId].getValue.call(this));
+        } else {
+            var response = new Response(true);
+        }
+
+        return response;
+
+    },
+
+    setPropertyValueInOperation: function(propertyId, value, ignoreBindings) {
+            if (!isSet(ignoreBindings)) ignoreBindings = true;
             try {
+                var operationId = "Changin value for ["+propertyId+"]";
                 window.holoComponentManager.operationManager.recordOperation(operationId); 
 
-                this.ignoreBindings = true; 
+                this.ignoreBindings = ignoreBindings; 
 
-                var response = this.setPropertyValue(bindedPropertyId, this.skinAttributes[skinAttributId].getValue.call(this), false);
+                var response = this.setPropertyValue(propertyId,value,false);
                 window.holoComponentManager.operationManager.finishRecording(response.result);                        
             } catch(e) {
                 var response = new Response(false);
@@ -1664,11 +1685,7 @@ HoloComponent.prototype = {
 
             this.ignoreBindings = false;
             return response;
-        } else {
-            return new Response(true);
-        }
-        
-    },
+    },    
 
     setPropertyValuesForSkinAttributesInOperation: function(skinAttributeIds, operationId) {
         var presetValues = {};
@@ -1814,10 +1831,10 @@ HoloComponent.prototype = {
                     for (var skinAttribute in this.type.propertyBindingsToSkinAttributes) {
                         switch (skinAttribute) {
                             case "positionX":
-                                this._setX(isSet(this.skinXCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinXCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+                                this._setX(this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
                                 break;
                             case "positionY":
-                                this._setY(isSet(this.skinYCenter) ? this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]) - this.skinYCenter : this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
+                                this._setY(this.getPropertyValue(this.type.propertyBindingsToSkinAttributes[skinAttribute]));
                                 break;								
 
                             default: 
@@ -2012,11 +2029,15 @@ HoloComponent.prototype = {
     },
     
     _setX: function(value) {
-        if (this.skinInstance) this.skinInstance.css("left", value);
+        var left = isSet(this.skinXCenter) ? value - this.skinXCenter : value;
+        trace("**************************** "+left);
+        if (this.skinInstance) this.skinInstance.css("left", left);
     },
     
     _setY: function(value) {
-        if (this.skinInstance) this.skinInstance.css("top", value);		
+        var top = isSet(this.skinYCenter) ? value - this.skinYCenter : value;
+
+        if (this.skinInstance) this.skinInstance.css("top", top);		
     },
     
     // Event handlers

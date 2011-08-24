@@ -323,11 +323,15 @@ GRASPPlayer.prototype = {
 
                 onValueChange: function (args) {
                     trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
-                    var respond = window.player.inspectedComponent.setPropertyValue(args.id, args.value);
+
+                    var respond = window.player.inspectedComponent.setPropertyValueInOperation(args.id, args.value, false);
+
                     if (!respond.result) {
-                        var widget = this.propertyWidgets[typeId];
+                        var widget = this.propertyWidgets[args.id];
                         if (widget) {
-                            widget.value = 0;
+                            var value = this.inspectedComponent.getPropertyValue(args.id)
+                            widget.propertyInstanceDescriptor.value = value;
+                            widget.propertyInstanceDescriptor.valid = true;
                             widget.render();
                         }
                     }
@@ -356,9 +360,16 @@ GRASPPlayer.prototype = {
                         onValueChange: function (args) {
                             trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
 
-                            var respond = window.player.inspectedComponent.setPropertyValue(args.id, args.value);
+                            var respond = window.player.inspectedComponent.setPropertyValueInOperation(args.id, args.value, false);
+
                             if (!respond.result) {
-                                
+                                var widget = this.propertyWidgets[args.id];
+                                if (widget) {
+                                    var value = this.inspectedComponent.getPropertyValue(args.id)
+                                    widget.propertyInstanceDescriptor.value = value;
+                                    widget.propertyInstanceDescriptor.valid = true;
+                                    widget.render();
+                                }
                             }
                             
                         },
@@ -386,7 +397,7 @@ GRASPPlayer.prototype = {
 
             freeList.renderPropertyWidgets();
 
-            this.propertyWidgets = {};
+            this.propertyWidgets = freeList.propertyWidgets || {};
 
             for (var i in groupLists) {
                 var list = groupLists[i];
@@ -963,6 +974,7 @@ GRASPComponent.prototype = {
             var widget = window.player.propertyWidgets[typeId];
             if (widget) {
                 widget.propertyInstanceDescriptor.value = value;
+                //trace("in on_propertValueChanged "+value);
                 widget.propertyInstanceDescriptor.valid = true;
                 widget.render();
             }
@@ -977,6 +989,19 @@ GRASPComponent.prototype = {
                 widget.propertyInstanceDescriptor.value = value;
                 widget.propertyInstanceDescriptor.valid = response.result;
                 widget.render();
+            }
+        }
+    },
+
+    on_testPresetPropertyValues: function(response) {
+        if (window.player.inspectedComponent == this) {
+            for (var i in this.presetPropertyValues) {
+                var widget = window.player.propertyWidgets[i];
+                if (widget) {
+                    widget.propertyInstanceDescriptor.value = this.presetPropertyValues[i];
+                    widget.propertyInstanceDescriptor.valid = response.result;
+                    widget.render();
+                }
             }
         }
     }

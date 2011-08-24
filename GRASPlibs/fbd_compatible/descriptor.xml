@@ -166,7 +166,7 @@
                         	</dictionary>                            
 							<constraints>
 								<constraint><![CDATA[
-									 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this);
+									 if (this.presetValue>275 && this.presetValue<=360) return new Response(false, "WRONG_DIRECTION", this);
 								]]></constraint>
 							</constraints>
                             <widget type="TextField">
