@@ -182,6 +182,32 @@ function GRASPPlayer(initObj){
       //  window.player.removePropertiesPanel();
         return false;
     });
+
+    $(document).keydown(function(e) {
+        //trace(e.which);           
+        e.stopPropagation();
+        if (e.which == 8 || e.which == 46) {
+
+            if (window.player.selectedComponents) {
+                
+                var todelete = $.extend(true, [], window.player.selectedComponents)
+                
+                window.holoComponentManager.operationManager.recordOperation("Delete component"); 
+
+                window.player.clearSelection();
+
+                for (var i=0; i <todelete.length; i++) {
+                    var c = todelete[i];
+
+                    var response = c.destruct(true);
+                }
+
+                window.holoComponentManager.operationManager.finishRecording(response.result);                
+            }
+        }
+    });
+
+
     
 //    $(document).one('click',null,function(){window.player.removePropertiesPanel()}); 
 

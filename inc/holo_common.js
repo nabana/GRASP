@@ -460,6 +460,7 @@ PropertyInstance.prototype = {
     _oldValue: null,
     _presetValue: null,
     _parentComponent: null,
+    parentProperty: null,
 
     getDescriptor: function() {
         return {
@@ -477,7 +478,7 @@ PropertyInstance.prototype = {
 
     usePresetValue: function(){
 
-        this._oldValue = this.value;
+        this._oldValue = this._value;
         this._value = this.presetValue;
 
         if (window.holoComponentManager.operationManager.beingRecordedOperation){
@@ -545,12 +546,30 @@ PropertyInstance.prototype = {
         }
     },
 
-    destruct: function(){
-        if (window.holoComponentManager.propertyManager){
+    destruct: function(full) {
+
+        if (full) {
+
+            if (this.parentProperty) {
+                this.parentProperty.removeMemberProperty(this);
+            }
+
+            var response = new Response(true);
+
+        } else {
+            var response = new Response(true);
+        }
+
+        if (response.result && window.holoComponentManager.propertyManager){
             window.holoComponentManager.propertyManager.unregisterProperty(this);
         }
+
+        return response;
     },
 
+    resetValue: function() {
+        return this.setValue(this.type.defaultValue);
+    },
 
     // Getters/setters
     get value(){
@@ -669,6 +688,7 @@ SetInstance.prototype = {
         if (memberProperty.type.protoName == this.type.memberType.protoName && this.size < this.type.maxSize){
             this._value[memberProperty.id] = memberProperty;
             memberProperty.parentComponent = this.parentComponent;
+            memberProperty.parentProperty = this;
             this.size++;
             this.dispatchEvent("MEMBERPROPERTY_ADDED", memberProperty);
 
@@ -686,6 +706,7 @@ SetInstance.prototype = {
       if (this._value[memberProperty.id] == memberProperty) {
           delete this._value[memberProperty.id];
           memberProperty.parentComponent = null;
+          memberProperty.parentProperty = null;
           this.size--;
           this.dispatchEvent("MEMBERPROPERTY_REMOVED", memberProperty);
           if (window.holoComponentManager.operationManager.beingRecordedOperation){
@@ -806,7 +827,7 @@ VariableType.prototype.initFromJSONObj = function(jsonObj){
 /*
  * ReferenceType 
  * 
- */
+ 1*/
 function ReferenceType(){}
 
 ReferenceType.prototype = {
@@ -842,22 +863,28 @@ function ReferenceInstance(propertyType, id){
 
 ReferenceInstance.prototype = {
     _oldParentComponent: null,
-    
+    _parentComponent: null,
+
     visualize: function() {
         
         if (window.holoComponentManager) {
             var referencedInstance = window.holoComponentManager.getComponentById(this._value);
-            
-            if (referencedInstance) {
-                switch (this.type.visualizedAs){
-                    case "CONTAINMENT":
-                        
+            var oldReferencedInstance = window.holoComponentManager.getComponentById(this._oldValue);
+
+            switch (this.type.visualizedAs){
+                case "CONTAINMENT":
+                    if (oldReferencedInstance && oldReferencedInstance!= referencedInstance) {
+                        if (this.parentComponent) this.parentComponent.removeChild(oldReferencedInstance);
+                    }
+
+                    if (referencedInstance) {
                         if (this._oldParentComponent) this._oldParentComponent.removeChild(referencedInstance);
                         if (this.parentComponent) this.parentComponent.addChild(referencedInstance);
-                
-                        break;
-                }
+                    }
+            
+                    break;
             }
+
         }
     },
     
@@ -873,6 +900,8 @@ ReferenceInstance.prototype = {
         
         this._parentComponent = value;
         this.visualize();
+
+        this._oldParentComponent = null;
     },
     
     get parentComponent() {
@@ -896,7 +925,19 @@ ReferenceInstance.prototype.testPresetValue = function(){
 ReferenceInstance.prototype.usePresetValue = function(){
     PropertyInstance.prototype.usePresetValue.call(this);
 
+    if (this._oldValue) {
+        var oldC = window.holoComponentManager.getComponentById(this._oldValue);
+        delete oldC.referencesTo[this.id];
+    }
+    if (this._value) {
+        var c = window.holoComponentManager.getComponentById(this._value);
+        c.referencesTo = c.referencesTo || {};
+        c.referencesTo[this.id] = this;
+    }     
+
     this.visualize();
+
+    this._oldValue = null;
 }
 
 
@@ -1351,7 +1392,7 @@ HoloComponent.prototype = {
 
     valid: true,
 
-    parentComponent: null,
+    referencesTo: null,
     // Array, containing the children
     _childComponents: null,
     // index for children
@@ -1937,8 +1978,55 @@ HoloComponent.prototype = {
         return xml;
     },
 
-    destruct: function(){
-        window.holoComponentManager.unregisterComponent(this);
+    destruct: function(full){
+        if (full) {
+            if (this.referencesTo) {
+                for (var i in this._properties) {
+
+                    var p = this._properties[i];
+
+                    var response = p.resetValue();
+                    
+                    if (response.result) {
+                        this.unassignInstanceToProperty(p.type.id, p); 
+
+                        response = p.destruct(full);
+                    }
+
+                    if (!response.result) break;                        
+                }
+
+                
+                if (response.result) {
+                    for (var i in this.referencesTo) {
+                        var r = this.referencesTo[i];
+
+                        response = r.resetValue();
+
+
+                        if (response.result) {
+
+                            if (r.parentComponent) {
+                                r.parentComponent.unassignInstanceToProperty(r.type.id, r);
+                            }
+                            
+                            response = r.destruct(full);
+                        }
+
+
+                        if (!response.result) break;
+                    }
+                }
+
+            }
+
+        } else {
+            response = new Response(true);
+        }
+
+        if (response.result) window.holoComponentManager.unregisterComponent(this);
+
+        return response;
     },
 
     // visual operations
@@ -2030,13 +2118,11 @@ HoloComponent.prototype = {
     
     _setX: function(value) {
         var left = isSet(this.skinXCenter) ? value - this.skinXCenter : value;
-        trace("**************************** "+left);
         if (this.skinInstance) this.skinInstance.css("left", left);
     },
     
     _setY: function(value) {
         var top = isSet(this.skinYCenter) ? value - this.skinYCenter : value;
-
         if (this.skinInstance) this.skinInstance.css("top", top);		
     },
     

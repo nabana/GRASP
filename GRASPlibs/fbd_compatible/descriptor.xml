@@ -240,7 +240,7 @@
                             </widget>                            
 		                </variable>
                         
-		                <variable id="Rotation" quantity="Direction" label="Rot" bindToSkinAttribute="ellipseRotation"  defaultValue="90">
+		                <variable id="Rotation" quantity="Direction" label="Rot" bindToSkinAttribute="ellipseRotation"  defaultValue="0">
 							<!-- <constraints> -->
 							<!-- 	<constraint><![CDATA[ -->
 							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
