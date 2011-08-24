@@ -58,7 +58,7 @@
     padding-left: 3px;
 }
 
-.hintContainer.error{
+.hintContainer.invalid{
     font-size: 11px;
     color: #e60000;
 }

@@ -453,24 +453,32 @@ div.clock {
     display:none;
     width:240px;
     background-color:white;
-    border:1px solid black;
+    border:1px solid #2C69A0;
     padding:0px;
     position: absolute;
-    font-size: 11px;
+    font-size: 10px;
     z-index: 1000;
+    box-shadow: 0px 0px 5px rgba(0,0,0,.4);
+ 
 }
 
 #propertiesPanel .content {
     text-align: left;
+    max-height: 360px;
+    overflow: auto;       
 }
 
 .widgetsListLabel {
     font-weight: bold;
+    padding: 0 4px;
+    margin-top: 3px;
+    font-size: 8px;
+    text-transform: uppercase;
 }
 
 .widgetsList .labelContainer {
     text-align: right;
-    width: 70px;
+    /* width: 70px; */
 }
 
 .widgetsList .controlContainer {
@@ -479,22 +487,55 @@ div.clock {
 
 .unit {
     margin-left: 2px;
+    width: 45px;
 }
 
 .widgetsList {
     width: 100%;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
+    border-bottom: 1px dotted #999;
+    padding: 3px 5px;
+
 }
 
 .listHolder {
-    padding: 4px;
 }
 
 .context-menu .title {
     font-weight: bold;
-    font-size: 12px;
+    font-size: 10px;
     color: white;
-    background-color: #333;
-    padding: 3px;
-    margin-bottom: 5px;
+    background-color: #2C69A0;
+    padding: 2px 5px;
+    margin-bottom: 2px;
+    text-align: left;
+}
+
+.context-menu input, .context-menu textarea {
+    font-size: 9px;
+    height: 8px;
+}
+
+.context-menu select  {
+    font-size: 9px;
+}
+
+.context-menu input[type="checkbox"] {
+    height: 12px;
+    font-size:10px;
+}
+
+.valid .valueContainer {
+    padding-right: 20px;    
+}
+
+.invalid .valueContainer  {
+    background-image: url(../assets/not_ok_mark_small.png);
+    background-repeat: no-repeat;
+    background-position: right center;
+    padding-right: 20px;
+}
+
+.invalid input, .invalid select, .invalid textarea {
+    color: red;
 }

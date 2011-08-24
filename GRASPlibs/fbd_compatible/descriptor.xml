@@ -83,7 +83,7 @@
                 <!--     } -->
                 <!-- ]]></constraint> -->
                 <constraint><![CDATA[
-                    if (this.presetPropertyValues['MajorAxis'] != undefined && this.presetPropertyValues['MinorAxis'] != undefined) {
+                    if (this.presetPropertyValues['MajorAxis'] != undefined || this.presetPropertyValues['MinorAxis'] != undefined) {
                        if (this.presetPropertyValues['MajorAxis'] < 30 || this.presetPropertyValues['MinorAxis'] < 30 ||
                            this.presetPropertyValues['MajorAxis'] > 150 || this.presetPropertyValues['MinorAxis'] > 150  ) {
                             return new Response(false, "WRONG_ELLIPSE_SIZE", this);

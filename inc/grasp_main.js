@@ -219,17 +219,20 @@ GRASPPlayer.prototype = {
     },
 
     removePropertiesPanel: function(panel) {
-        if (!panel) panel = window.player.propertiesPanel;
+        if (!panel) panel = this.propertiesPanel;
         if (panel) {
             trace("in removePropertiesPanel"); // HERE
             panel.hide();
-            for (var i in window.player.propertyLists) {
-                window.player.propertyLists[i].removePropertyWidgets();
+            for (var i in this.propertyLists) {
+                this.propertyLists[i].removePropertyWidgets();
             }
+
+            this.propertyWidgets = null;
+            this.propertyLists = null;
 
             panel.remove();
 
-            window.player.inspectedComponent = null;
+            this.inspectedComponent = null;
         }
     },
 
@@ -243,6 +246,7 @@ GRASPPlayer.prototype = {
             var panel = $('<div/>', {
                 'class': 'context-menu',
                 id: 'propertiesPanel',
+                html: '<div class="title">Properties of '+c.type.label+' ['+c.getPropertyValue('symbol')+c.getPropertyValue('screenId')+']</div>',
             });
 
             var panelContent = $('<div/>', {
@@ -251,22 +255,47 @@ GRASPPlayer.prototype = {
 
             panel.append(panelContent);
 
-            $('body').append(panel);
+            
+            var offset;
+            if (where) {
+                // position is specific
+               
+                var holder = $('body');
+                holder.append(panel);
 
-            var offset = where;
-            var pWidth = panel.width();
+                var offset = where;
+                var pWidth = panel.width();
 
-            var left = 0;
-            var top = offset.top;
+                var left = 0;
+                var top = offset.top;
 
-            if (offset.left+pWidth > $(document).width()) {
-                left = offset.left - pWidth;
+                if (offset.left+pWidth > $(document).width()) {
+                    left = offset.left - pWidth;
+                } else {
+                    left = offset.left;
+                }
+
+                panel.css('left', left);
+                panel.css('top', top);
+                
             } else {
-                left = offset.left;
+                // display it on the other side of mainContent
+                
+                var holder = $('#mainContent');
+                holder.append(panel);
+
+                panel.css('top', 70);
+
+                var offset = c.skinInstance.offset();
+
+                if (offset.left > $('#mainContent').width()/2) {
+                    panel.css('left', 20);
+                } else {
+                    panel.css('right', 20);
+                }
             }
 
-            panel.css('left', left);
-            panel.css('top', top);
+          
 
             // here comes the content
             
@@ -277,7 +306,6 @@ GRASPPlayer.prototype = {
 
             var listHolder = $('<div/>', {
                 'class': 'listHolder',
-                html: '<div class="title">Properties of '+c.type.label+'</div>',
             });
 
 
@@ -297,7 +325,11 @@ GRASPPlayer.prototype = {
                     trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
                     var respond = window.player.inspectedComponent.setPropertyValue(args.id, args.value);
                     if (!respond.result) {
-                        
+                        var widget = this.propertyWidgets[typeId];
+                        if (widget) {
+                            widget.value = 0;
+                            widget.render();
+                        }
                     }
 
                 },
@@ -354,16 +386,23 @@ GRASPPlayer.prototype = {
 
             freeList.renderPropertyWidgets();
 
+            this.propertyWidgets = {};
+
             for (var i in groupLists) {
                 var list = groupLists[i];
                 list.renderPropertyWidgets();
+                $.extend(this.propertyWidgets, list.propertyWidgets);
             }
 
             groupLists["__0__"] = freeList;
 
             this.propertyLists = groupLists;
-
             this.inspectedComponent = c;
+
+            listHolder.append($('<div/>', {
+                style: "clear: both",
+            }));
+
 
             panel.show();
 
@@ -631,8 +670,7 @@ GRASPPlayer.prototype = {
 
     setSelection: function(ids, addToExistingSelection, record){
 
-        var oldPanel = window.player.propertiesPanel;
-        window.player.removePropertiesPanel(oldPanel);
+        window.player.removePropertiesPanel();
 
         var changed = false;
 
@@ -779,11 +817,21 @@ GRASPPlayer.prototype = {
                   window.player.removePropertiesPanel();                
             }
 
-            if (e.which == 3) {
-               
-                window.player.renderPropertiesPanelFor(id, {left: e.pageX, top:e.pageY});
-            }
+            // if (e.which == 3) {
+            //    
+            //     window.player.renderPropertiesPanelFor(id);
+            // }
         }        
+    },
+
+    on_component_mouseup: function(e){
+        //e.stopPropagation();
+
+        if (e.which == 3) {
+            var id = $(e.currentTarget).attr('id');
+
+            window.player.renderPropertiesPanelFor(id);
+        }
     },
 
     // getters/setters
@@ -900,11 +948,39 @@ GRASPComponent.prototype = {
     },
 
     deselect: function(){
+
+        trace("in deselect");
+
+
         if (this.control){
             this.control.detachFromComponent();
             delete this.control;
         }
+    },
+
+    on_propertValueChanged: function(typeId, value) {
+        if (window.player.inspectedComponent == this) {
+            var widget = window.player.propertyWidgets[typeId];
+            if (widget) {
+                widget.propertyInstanceDescriptor.value = value;
+                widget.propertyInstanceDescriptor.valid = true;
+                widget.render();
+            }
+
+        }
+    },
+
+    on_propertValueTried: function(typeId, value, response) {
+        if (window.player.inspectedComponent == this) {
+            var widget = window.player.propertyWidgets[typeId];
+            if (widget) {
+                widget.propertyInstanceDescriptor.value = value;
+                widget.propertyInstanceDescriptor.valid = response.result;
+                widget.render();
+            }
+        }
     }
+
 }
 
 

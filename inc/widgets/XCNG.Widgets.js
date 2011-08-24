@@ -36,9 +36,9 @@ $xcng.widgets.WidgetList.prototype = {
     quantities: null,
     propertyTypeDescriptors: null,
     propertyInstanceDescriptors: null,
-    widgets: null,
+    propertyWidgets: null,
 
-    widgetsHolderTemplate:'<table><tbody></tbody></table>',
+    widgetsHolderTemplate:'<table cellspacing="0"><tbody></tbody></table>',
     widgetSkinTemplate: null,
     widgetLabelPostfix: null,
 
@@ -47,12 +47,9 @@ $xcng.widgets.WidgetList.prototype = {
     onValueChange_ctx: null,
 
     renderPropertyWidgets: function() {
-        trace('renderPropertyWidgets');
         if (this.propertyInstanceDescriptors) {
-            trace('propertyInstanceDescriptors');
             
             if (!this.widgetsHolder) {
-                trace('renderPropertyWidgets2');
                 this.widgetsHolder = $(this.widgetsHolderTemplate);
                 this.widgetsHolder.attr('id', this.id);
                 this.widgetsHolder.addClass('widgetsList');
@@ -70,12 +67,11 @@ $xcng.widgets.WidgetList.prototype = {
                     this.widgetsHolder.appendTo(this.containerElement);
                 }
             }
-            trace('renderPropertyWidgets3');
             
             this.removePropertyWidgets();
             this.propertyWidgets && this.propertyWidgets.length && this.removePropertyWidtgets();
     
-            this.propertyWidgets = [];
+            this.propertyWidgets = {};
             
             for (var i=0; i<this.propertyInstanceDescriptors.length; i++) {
                 var d = this.propertyInstanceDescriptors[i];
@@ -83,7 +79,7 @@ $xcng.widgets.WidgetList.prototype = {
                 
                 var widgetType = this.propertyTypeDescriptors[d.typeId].widget;
                 
-                trace(widgetType);
+                //trace(widgetType);
                 if ($.isFunction($xcng.widgets[widgetType])){
                     var widget = new  $xcng.widgets[widgetType](d, this.mode, this);
                     if (this.widgetSkinTemplate) widget.skinTemplate = this.widgetSkinTemplate;
@@ -96,7 +92,7 @@ $xcng.widgets.WidgetList.prototype = {
                             e.host.onValueChange.call(ctx, args);
                         }
                     });
-                    this.propertyWidgets.push(widget);
+                    this.propertyWidgets[d.id]=widget;
                 }
             }
         }
@@ -104,12 +100,12 @@ $xcng.widgets.WidgetList.prototype = {
 
     removePropertyWidgets: function() {
         if(this.propertyWidgets) {
-            for (var i=0; i<this.propertyWidgets.length; i++) {
+            for (var i in this.propertyWidgets) {
                 this.propertyWidgets[i].removeAllEventListeners("VALUE_CHANGED");
                 this.propertyWidgets[i].remove();
             }
 
-            this.propertyWidgets = [];
+            this.propertyWidgets = null;
         }
     },
     
@@ -155,7 +151,7 @@ $xcng.widgets.PropertyWidget.prototype = {
     mode: "INPUT",  // default mode
     host: null,
 
-    skinTemplate: '<tr><td class="labelContainer"></td><td class="valueContainer"><div class="controlContainer"/><div class="statusContainer"/><div class="hintContainer"/></td></tr>',
+    skinTemplate: '<tr><td class="labelContainer"></td><td class="valueContainer"><div class="controlContainer"/><div class="hintContainer"/></td></tr>',
     labelPostfix: "",
 
     renderTo: function(containerElement) {
@@ -169,7 +165,13 @@ $xcng.widgets.PropertyWidget.prototype = {
         var propertyInstanceDescriptor = this.propertyInstanceDescriptor;
         var pLabel = this.propertyTypeDescriptor.label;
         var unit = propertyInstanceDescriptor.unit;
-        this.skin = $(this.skinTemplate);
+        var oldSkin;
+        if (!this.skin) {
+            this.skin = $(this.skinTemplate);
+        } else {
+            oldSkin = this.skin;
+            this.skin = $(this.skinTemplate);            
+        }
         this.skin.attr('id', propertyInstanceDescriptor.id+"_widget");
         this.skin.attr('title', this.propertyTypeDescriptor.description);
         this.skin.addClass('widgetSkin');        
@@ -183,19 +185,16 @@ $xcng.widgets.PropertyWidget.prototype = {
         this.controlContainer = this.skin.find('.controlContainer');
         this.statusContainer = this.skin.find('.statusContainer');
 
-        if (propertyInstanceDescriptor.valid) {
-            this.statusContainer.append('<div class="ok"/>');
+        if (!propertyInstanceDescriptor.valid) {
+            this.skin.addClass('invalid');
         } else {
-            this.statusContainer.append('<div class="not_ok"></div>');
-        }        
+            this.skin.addClass('valid');
+        }
 
         this.hintContainer = this.skin.find('.hintContainer');
         
         if (isSet(propertyInstanceDescriptor.hint)) {
             this.hintContainer.text(propertyInstanceDescriptor.hint);
-            if (!propertyInstanceDescriptor.valid) {
-                this.hintContainer.addClass('error');
-            }
         }
 
         this.skin.data('host', this);
@@ -205,8 +204,13 @@ $xcng.widgets.PropertyWidget.prototype = {
             
             // should be implemented in children
             this.renderControl();
-
-            this.skin.appendTo(this.containerElement);
+            
+            if (oldSkin) {
+                this.skin.insertBefore(oldSkin);
+                oldSkin.remove();
+            } else {
+                this.skin.appendTo(this.containerElement);
+            }
         }
     },
 
@@ -270,7 +274,7 @@ $xcng.widgets.TextField.prototype = {
                     if (options.length == 1) {
                         unitE = $('<span/>', {
                             text: unit.symbol,
-                            'class': 'unit'
+                            'class': 'unit '+this.quantity.id
                         });
                     } else {
                         var optionsHtml = "";
@@ -280,7 +284,7 @@ $xcng.widgets.TextField.prototype = {
                         unitE = $('<select/>', {
                             html: optionsHtml,
                             disabled: this.propertyTypeDescriptor.readonly ? true : false,
-                            'class': 'unit',
+                            'class': 'unit '+this.quantity.id,
                             change: function() {
                                 var host = $(this).data('host');
                                 host.propertyInstanceDescriptor.unitId = $(this).val();
@@ -334,6 +338,8 @@ $xcng.widgets.TextField.prototype = {
                     }
 
                     var control = inputE.after(unitE);
+
+                    if (isSet(this.propertyTypeDescriptor.widgetParameters) && isSet(this.propertyTypeDescriptor.widgetParameters.width)) inputE.width(this.propertyTypeDescriptor.widgetParameters.width);
                 
                 } else {
 
@@ -352,6 +358,7 @@ $xcng.widgets.TextField.prototype = {
                     });
 
 
+                    if (isSet(this.propertyTypeDescriptor.widgetParameters) && isSet(this.propertyTypeDescriptor.widgetParameters.width)) control.width(this.propertyTypeDescriptor.widgetParameters.width);
                 }
                 
     
@@ -362,7 +369,7 @@ $xcng.widgets.TextField.prototype = {
                 if (unit) {
                         unitE = $('<span/>', {
                         text: unit.symbol,
-                        'class': 'unit'
+                        'class': 'unit '+this.quantity.id
                     });
                 }
 
@@ -372,11 +379,12 @@ $xcng.widgets.TextField.prototype = {
                 }).add(unitE);
                 
 
+                if (isSet(this.propertyTypeDescriptor.widgetParameters) && isSet(this.propertyTypeDescriptor.widgetParameters.width)) control.width(this.propertyTypeDescriptor.widgetParameters.width);
+
                 break;
 
         }
        
-        if (isSet(this.propertyTypeDescriptor.widgetParameters) && isSet(this.propertyTypeDescriptor.widgetParameters.width)) control.width(this.propertyTypeDescriptor.widgetParameters.width);
 
         control.data('host', this);
         

@@ -230,6 +230,9 @@ jQuery.fn.extend({
                     //trace("Rotation started...");
                     host = target.data("host");
                     var angle =  host.css("rotate");
+                    
+                    if (angle < 0) angle = 360+angle;
+                    
                     target.data("startAngle", angle);
 
 			        var rotateStart = target.data("rotateStart"); 
@@ -558,6 +561,10 @@ $(document).mousemove(function(e){
 			var newAngle = (mX < 0) ? 180 + (Math.atan(mY / mX) / Math.PI * 180 - angleOffset) : Math.atan(mY / mX) / Math.PI * 180 - angleOffset;
 			var host = wrapper.data("host");
 			var oldAngle = wrapper.data("host").css('rotate');
+
+            if (oldAngle < 0) oldAngle = 360+oldAngle;
+            if (newAngle < 0) newAngle = 360+newAngle;
+
 	        var rotateChange = target.data("rotateChange"); 
 	        if (rotateChange) {
 	            if (rotateChange.call(host, oldAngle, newAngle)) {

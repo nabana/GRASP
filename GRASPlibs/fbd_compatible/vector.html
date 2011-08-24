@@ -17,7 +17,11 @@
                 },
 
                 getValue: function() {
-                    if (this.skinParts.arrowCanvas) return this.skinParts.arrowCanvas.css('rotate');
+//                    trace("***************************************************** "+this.skinParts.arrowCanvas.css('rotate'));                    
+                    if (this.skinParts.arrowCanvas) {
+                        var r = Number(this.skinParts.arrowCanvas.css('rotate'));
+                        return !isNaN(r) ? r : 0;
+                    }
                 }
             },
 
@@ -29,12 +33,17 @@
                 getValue: function() {
 //                    trace("***************************************************** "+this.skinParts.ellipseCanvas.css('rotate'));
 
-                    if (this.skinParts.ellipseCanvas) return this.skinParts.ellipseCanvas.css('rotate');
+                    if (this.skinParts.ellipseCanvas) {
+                        var r = Number(this.skinParts.ellipseCanvas.css('rotate'));
+                        return !isNaN(r) ? r : 0;
+                        
+                    }
                 }
             },
 
             ellipseWidth: {
                 setValue: function (value) {
+                    trace("********** ew"+value);                    
                     if (this.skinParts.ellipseCanvas) {
                         this.skinParts.ellipseCanvas.resize(value, this.skinParts.ellipseCanvas.height());
                     }
@@ -49,6 +58,7 @@
 
             ellipseHeight: {
                 setValue: function (value) {
+                    trace("********** eh"+value);
                     if (this.skinParts.ellipseCanvas) {
                         this.skinParts.ellipseCanvas.resize(this.skinParts.ellipseCanvas.width(), value);
                     }

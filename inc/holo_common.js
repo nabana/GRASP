@@ -455,6 +455,7 @@ function PropertyInstance(propertyType, id){
 PropertyInstance.prototype = {
     id: null,
     type: null,
+    valid: true,
     _value: null,
     _oldValue: null,
     _presetValue: null,
@@ -465,7 +466,8 @@ PropertyInstance.prototype = {
                     id: this.type.id,
                     typeId: this.type.id,
                     unitId: this.unitId,
-                    value: this._value
+                    value: this._value,
+                    valid: this.valid
         }
     },
 
@@ -506,7 +508,11 @@ PropertyInstance.prototype = {
             }
         }
 
-        this.dispatchEvent("VALUE_CHANGED", this._value);
+        //this.dispatchEvent("VALUE_CHANGED", this._value);
+
+        if (this._parentComponent && $.isFunction(this._parentComponent.on_propertValueChanged)) {
+           this._parentComponent.on_propertValueChanged.call(this._parentComponent, this.type.id, this._value); 
+        }
     },
 
     setValue: function(presetValue, ignoreConstraints){
@@ -527,6 +533,11 @@ PropertyInstance.prototype = {
         this.presetValue = presetValue;
         var testResponse = null;
         testResponse = this.testPresetValue();
+
+        if (this._parentComponent && $.isFunction(this._parentComponent.on_propertValueTried)) {
+           this._parentComponent.on_propertValueTried.call(this._parentComponent, this.type.id, presetValue, testResponse); 
+        }
+
         if (testResponse.result === true){
             return new Response(true);
         } else{
@@ -1202,7 +1213,8 @@ HoloComponentType.prototype = {
                 id: t.id,
                 typeId: t.id,
                 value: t.defaultValue,
-                unitId: t.defaultUnit
+                unitId: t.defaultUnit,
+                valid: true
             } 
 
         } else{
@@ -1336,6 +1348,8 @@ function HoloComponent(typeId, id, isDummy){
 HoloComponent.prototype = {
     id: null,
     type: null,
+
+    valid: true,
 
     parentComponent: null,
     // Array, containing the children
@@ -2030,7 +2044,9 @@ HoloComponent.prototype = {
         if (skinString == "") skinString = "<div id='" + this.id + "-childContainer' class='defaultSkin-childContainer'></div>";
 
         if (this._skinInstance){
-            this._skinInstance.unbind('click', window.player.on_component_mousedown);
+            this._skinInstance.unbind('mousedown', window.player.on_component_mousedown);
+            this._skinInstance.unbind('mouseup', window.player.on_component_mouseup);
+            
             delete this._skinInstance;
         }
 
@@ -2060,6 +2076,7 @@ HoloComponent.prototype = {
             }
 
         this._skinInstance.bind('mousedown', window.player.on_component_mousedown);
+        this._skinInstance.bind('mouseup', window.player.on_component_mouseup);
 
         if (this.getPropertyValue("draggable") == "true"){
             this.skinInstance.css("cursor", "move");
