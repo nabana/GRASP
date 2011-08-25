@@ -310,7 +310,7 @@
 				</group>					
             </properties>
         </componentType>
-        <componentType id="MomentType" label="Moment" symbol="M" skinURL="moment.html" iconURL="assets/moment_icon.png">
+        <componentType id="CoupleType" label="Couple" symbol="C" skinURL="couple.html" iconURL="assets/couple_icon.png">
             <description>
                 This components represents the tendency of the force twisting an object
             </description>
@@ -319,37 +319,178 @@
 					this.setPropertyValues({"screenId": window.holoComponentManager.getComponentMaxCountByType(this.type.id)});
 				}
 			]]></onCreation>		
-            <properties>
-				<variable id="symbol" label="Symbol" defaultValue="M">
+          <properties>
+				<variable id="symbol" label="Symbol" defaultValue="C" readonly="true">
 					<description>
 						Symbol of the component
 					</description>
 				</variable>
-				<variable id="screenId" label="Screen ID" defaultValue="x">
+				<variable id="screenId" label="Screen ID" defaultValue="x" readonly="true" inspectable="false" bindToSkinAttribute="componentLabel" >
 					<description>
 						Screen ID of the component
 					</description>
+                    <widget type="TextField">
+                        <parameters>
+                            <parameter id="width">80</parameter>
+                        </parameters>
+                    </widget>                     
 				</variable>
-                <variable id="direction" label="Direction" defaultValue="true" bindToSkinAttribute="reflectionY">
-                    <description>
-                        Direction of the moment
-                    </description>
+
+                <group id="magnitudeProperties" label="Magnitude">
+                    <members>
+                        <variable id="Magnitude" label="Magnitude" defaultValue="1" quantity="ForceMagnitude">
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget>                        
+                        </variable>
+                        <variable id="MagnitudeFuzz" label="Magnitude fuzziness" defaultValue="0">
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget> 
+                        </variable>
+                        <variable id="MagValid" label="Validate magnitude" defaultValue="unchecked">
+                            <widget type="CheckBox"/>
+                        </variable>                
+                    </members>
+                </group>
+                <variable id="Name" defaultValue="" label="Name" bindToSkinAttribute="componentLabel">
+                    <widget type="TextField">
+                        <parameters>
+                            <parameter id="width">80</parameter>
+                        </parameters>
+                    </widget>                  
                 </variable>
-                <group id="visualProperties" label="Visual properties">
-					<members>
-                  <variable id="positionX" label="X" bindToSkinAttribute="positionX">
-                      <description>
-                          X coordinate
-                      </description>
-                  </variable>
-                  <variable id="positionY" label="Y" bindToSkinAttribute="positionY">
-                      <description>
-                          Y coordinate
-                      </description>
-                  </variable>
+                <variable id="Type" defaultValue="U" label="Type"  bindToSkinAttribute="componentLabel">
+                    <widget type="DropDown">
+                        <parameters>
+                            <parameter id="width">150</parameter>
+                        </parameters>
+                    </widget>
+                    <possibleValues>
+                        <value key="U">Undefined</value>
+                        <value key="W">Weight</value>
+                        <value key="E">Electrical Force</value>
+                        <value key="M">Magnetic Force</value>
+                        <value key="F">Applied Force</value>
+                        <value key="T">Tension</value>
+                        <value key="L">Muscle Force</value>
+                        <value key="N">Normal Force</value>
+                        <value key="ff">Friction Force</value>
+                        <value key="R">General Reaction Force</value>
+                        <value key="Rx">GRF, Horizontal Component</value>
+                        <value key="Ry">GRF, Vertical Component</value>
+                        <value key="J">Joint Reaction Force</value>
+                        <value key="Jx">JRF, Horizontal Component</value>
+                        <value key="Jy">JRF, Vertical Component</value>
+                    </possibleValues>
+                </variable>
+
+                <group id="Direction" label="Direction">
+                	<members>
+		                <variable id="Direction" quantity="Direction" label="Rot" bindToSkinAttribute="vectorRotation"  defaultValue="0">
+		                    <description>
+		                        Direction
+		                    </description>
+                        	<dictionary>
+                	        	<term id="WRONG_DIRECTION">Wrong direction.</term>
+                        	</dictionary>                            
+							<constraints>
+								<constraint><![CDATA[
+									 if (this.presetValue>275 && this.presetValue<=360) return new Response(false, "WRONG_DIRECTION", this);
+								]]></constraint>
+							</constraints>
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget>
+		                </variable>
+                        <variable id="DirectionFuzz" label="Direction fuzziness" defaultValue="3">
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget>                        
+                        </variable>
+                        <variable id="DirValid" label="Validate direction" defaultValue="unchecked">
+                            <widget type="CheckBox"/>
+                        </variable>
 					</members>
 				</group>
-				<group id="controlProperties">
+
+                <group id="AreaOfOrigin" label="Area of Origin">
+                	<members>
+                        <variable id="Area" label="Area name">
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">80</parameter>
+                                </parameters>
+                            </widget>                            
+                        </variable>
+						<variable id="CenterX" quantity="Position" label="X" bindToSkinAttribute="positionX" defaultValue="0">
+		                    <description>
+		                        X coordinate
+		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget>
+		                </variable>
+		                <variable id="CenterY" quantity="Position" label="Y" bindToSkinAttribute="positionY" defaultValue="0">
+		                    <description>
+		                        Y coordinate
+		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget>                            
+		                </variable>
+						<variable id="MajorAxis" quantity="Position" label="Major Axis" bindToSkinAttribute="ellipseWidth" defaultValue="60">
+		                    <description>
+		                        Major Axis
+		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>                            
+		                </variable>
+						<variable id="MinorAxis" quantity="Position" label="Minor Axis" bindToSkinAttribute="ellipseHeight" defaultValue="60">
+		                    <description>
+		                        Minor Axis
+		                    </description>
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                    <afterDecimal>0</afterDecimal>
+                                </parameters>
+                            </widget>                            
+		                </variable>
+                        
+		                <variable id="Rotation" quantity="Direction" label="Rot" bindToSkinAttribute="ellipseRotation"  defaultValue="0">
+							<!-- <constraints> -->
+							<!-- 	<constraint><![CDATA[ -->
+							<!-- 		 if (this.presetValue<0) return new Response(false, "WRONG_DIRECTION", this); -->
+							<!-- 	]]></constraint> -->
+							<!-- </constraints>-->
+                            <widget type="TextField">
+                                <parameters>
+                                    <parameter id="width">40</parameter>
+                                </parameters>
+                            </widget>
+                        </variable>
+		                                
+					</members>
+				</group>
+
+				<group id="controlProperties" inspectable="false">
 					<members>
 						<variable id="draggable" defaultValue="true"/>
 					</members>

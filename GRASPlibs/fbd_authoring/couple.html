@@ -100,28 +100,14 @@
 		var label = this.skinInstance.find('[id="label"]');
 		label.html(__host__.getPropertyValue("symbol")+"<span class='sub'>"+__host__.getPropertyValue("screenId")+"</span>");
 		label.css("left", -2);
-        var arrowCanvas = this.skinInstance.find('[id="arrowCanvas"]');
-        arrowCanvas[0].height = 20;
-        if(arrowCanvas[0].getContext) {
-            var cxt = arrowCanvas[0].getContext('2d');
-            cxt.moveTo(7,10);
-            cxt.lineTo(arrowCanvas.width(),10);
-			cxt.stroke();
-            cxt.moveTo(arrowCanvas.width()-13,6);
-            cxt.lineTo(arrowCanvas.width(),10);
-            cxt.lineTo(arrowCanvas.width()-13,14);
-            cxt.fill();
-			cxt.circle(4,10,3, false);
-        }
+		label.css("top", -34);
         
-		arrowCanvas.setRotationCenter(3, arrowCanvas.outerHeight()/2);   
-        arrowCanvas.rotate(0);	
-
-        // registering skinparts for quicker seeking
-        this.skinParts = {};
-
-        this.skinParts.arrowCanvas = arrowCanvas;
         this.skinParts.label = label;
+
+		var img = $(this.skinInstance.find('[id="myImg"]'));		
+		
+		img.attr("src","__libraryURL__/assets/couple_content.png");
+
 	};
 	
 	__host__.drawEllipse = function() {
@@ -196,39 +182,14 @@
 	
 	__host__.onSelect = function () {
 		
-        var arrowCanvas = this.skinParts.arrowCanvas;
-        var label = this.skinParts.label;	
-		var c = this;	
-
-        arrowCanvas.attachRotateControl({
-            color: "orange",
-            rotateStart: function(angle) {
-            },
-            
-            rotateStop: function(angle) {
-                var respond = c.setPropertyValuesForSkinAttributesInOperation(['vectorRotation']);
-                return respond.result;
-            },
-            
-			rotateChange: function (oldangle, angle) {
-                $fbd.positionVectorLabel.call(c, angle);
-                var respond = c.testPropertyValuesForSkinAttributes(['vectorRotation']);
-                return respond.result;
-			},
-
-        });
-        
-        arrowCanvas.data('hostComponent', this);
         __host__.drawEllipse();		
 	};
 	
 	
     __host__.onDeselect = function () {
         
-        var arrowCanvas = this.skinParts.arrowCanvas;
         var ellipseCanvas = this.skinParts.ellipseCanvas;
 
-        arrowCanvas.detachRotateControl();
         ellipseCanvas.detachRotateControl();
         ellipseCanvas.detachResizeControl();
 		
@@ -244,8 +205,9 @@
 
 	
 </script>
-<div id="base" class="vectorBase">
-	<p id="label" class="instanceLabel">Vector</p>
-	<div id="ellipseWrapper" ><canvas id="ellipseCanvas" class="toleranceEllipse layer" width="20"></canvas></div>
-    <div id="arrowWrapper" ><canvas id="arrowCanvas" class="arrow borderedWhenSelected layer" width="95"></canvas></div>	
-<div id="childContainer"></div>
+
+<div id="base" class="coupleBase">
+	<p id="label" class="instanceLabel">Couple</p>
+	<div id="ellipseWrapper" ><canvas id="ellipseCanvas" class="toleranceEllipse layer" width="20"></canvas></div>    
+	<div class="content"><img id="myImg" class="coupleImage" width="44" height="39" class="nonselectable"/></div>
+</div>
