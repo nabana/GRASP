@@ -71,7 +71,30 @@
 	
  	__host__.on_render = function(){ 
         this.skinParts.instructionsHolder = this.skinInstance.find('.instructionsHolder');
-        this.skinParts.bgImageContainer = this.skinInstance.find('.bgImageContainer');        
+        this.skinParts.bgImageContainer = this.skinInstance.find('.bgImageContainer');  
+
+        var mainCanvas = this.skinInstance.find('.mainCanvas');
+
+        mainCanvas[0].ondragover = function () { $(this).addClass('dragginOver');  return false; };
+        mainCanvas[0].ondragend = function () { $(this).removeClass('dragginOver'); return false; };
+
+        var host = this;
+        mainCanvas[0].ondrop = function (e) {
+          $(this).removeClass('dragginOver');
+          
+          e.preventDefault();
+
+          var file = e.dataTransfer.files[0],
+          reader = new FileReader();
+          reader.onload = function (event) {
+              host.setPropertyValues({'BgImage':event.target.result});
+          };
+          reader.readAsDataURL(file);
+
+          return false;
+        };
+        
+        
 	};
 	
 	__host__.on_drop = function(e, ui) {
