@@ -101,7 +101,7 @@
         	</dictionary>
 =        	<onCreation><![CDATA[
 				if (!this.isDummy) {
-					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
+					this.setPropertyValues({"screenId": window.holoComponentManager.getComponentMaxCountByType(this.type.id)});
                     trace(this.getPropertyValue("screenId"));
 				}
 			]]></onCreation>
@@ -306,7 +306,7 @@
             </description>
         	<onCreation><![CDATA[
 				if (!this.isDummy) {
-					this.setPropertyValue("screenId", window.holoComponentManager.getComponentMaxCountByType(this.type.id));
+					this.setPropertyValues({"screenId": window.holoComponentManager.getComponentMaxCountByType(this.type.id)});
 				}
 			]]></onCreation>		
             <properties>

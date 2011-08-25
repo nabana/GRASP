@@ -1490,73 +1490,6 @@ HoloComponent.prototype = {
          }
     },
 
-    setPropertyValue: function(propertyId, presetValue, ignoreConstraints){
-
-        this._properties = this._properties || {};
-
-        if (!isSet(this._properties[propertyId])){
-            var createResponse = this.createProperty(propertyId);
-            if (!createResponse.result){
-                return createResponse;
-            }
-        }
-
-        this.presetPropertyValues = this.presetPropertyValues || {};
-        this.presetPropertyValues[propertyId] = presetValue;
-
-        if (!ignoreConstraints){
-
-            var testResponse = this.testPresetPropertyValues();
-
-            if (testResponse.result === true){
-                var response2 = this.usePresetProperyValues();
-                delete this.presetPropertyValues[propertyId];
-                return response2;
-            }
-            else{
-              
-                delete this.presetPropertyValues[propertyId];
-                return testResponse;
-            }
-
-        } else{
-            this.usePresetProperyValues();
-            delete this.presetPropertyValues[propertyId];
-            return new Response(true);
-        }
-
-    },
-
-    testPropertyValue: function(propertyId, presetValue){
-
-        this._properties = this._properties || {};
-
-        if (!isSet(this._properties[propertyId])){
-            var createResponse = this.createProperty(propertyId);
-            if (!createResponse.result){
-                return createResponse;
-            }
-        }
-
-        this.presetPropertyValues = this.presetPropertyValues || {};
-        this.presetPropertyValues[propertyId] = presetValue;
-
-
-        var testResponse = this.testPresetPropertyValues();
-
-        if (testResponse.result === true){
-             var response2 = this.tryToUsePresetProperyValues();
-             return response2;
-        } else{
-           
-           delete this.presetPropertyValues[propertyId];
-           return testResponse;
-        }
-
-        return new Response(true);
-
-    },
-    
 
     setPropertyValues: function(presetValues, ignoreConstraints){
 
@@ -1566,8 +1499,13 @@ HoloComponent.prototype = {
             if (!isSet(this._properties[propertyId])){
                 var createResponse = this.createProperty(propertyId);
                 if (!createResponse.result){
+                   
+                    if ($.isFunction(this.on_setPropertyValues)) {
+                        this.on_setPropertyValues.call(this, createResponse);
+                    }
 
                     this.presetPropertyValues = {};
+
                     return createResponse;
                 }
             }
@@ -1581,11 +1519,20 @@ HoloComponent.prototype = {
             if (testResponse.result === true){
                 var response2 = this.usePresetProperyValues();
 
+                if ($.isFunction(this.on_setPropertyValues)) {
+                    this.on_setPropertyValues.call(this, response2);
+                }
+
                 this.presetPropertyValues = {};
 
                 return response2;
             }
             else{
+
+                if ($.isFunction(this.on_setPropertyValues)) {
+                    this.on_setPropertyValues.call(this, testResponse);
+                }
+                
                 this.presetPropertyValues = {};
 
                 return testResponse;
@@ -1595,6 +1542,13 @@ HoloComponent.prototype = {
             for (var propertyId in presetValues){
                 var property = this.getProperty(propertyId);
                 property.setValue(presetValues[propertyId], true);
+
+                if ($.isFunction(this.on_setPropertyValues)) {
+                    this.on_setPropertyValues.call(this, new Response(true));
+                }
+                
+                this.presetPropertyValues = {};
+                
             }
 
         }
@@ -1697,38 +1651,30 @@ HoloComponent.prototype = {
         return response;        
     },
 
-    setPropertyValueForSkinAttributeInOperation: function(skinAttributId) {
-        var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributId];
+    setPropertyValuesInOperation: function(presetValues, ignoreBindings) {
+        if (!isSet(ignoreBindings)) ignoreBindings = true;
 
-        if (bindedPropertyId) {
-            var response = this.setPropertyValueInOperation(bindedPropertyId, this.skinAttributes[skinAttributId].getValue.call(this));
-        } else {
-            var response = new Response(true);
+        try {
+
+            var composeOperationId = false;
+            
+            var operationId = "Changin property values for ["+this.id+"]";
+            window.holoComponentManager.operationManager.recordOperation(operationId); 
+
+            this.ignoreBindings = ignoreBindings; 
+
+            var response = this.setPropertyValues(presetValues, false);
+            window.holoComponentManager.operationManager.finishRecording(response.result);                        
+        } catch(e) {
+            var response = new Response(false);
         }
 
+        this.ignoreBindings = false;
         return response;
 
-    },
+    },  
 
-    setPropertyValueInOperation: function(propertyId, value, ignoreBindings) {
-            if (!isSet(ignoreBindings)) ignoreBindings = true;
-            try {
-                var operationId = "Changin value for ["+propertyId+"]";
-                window.holoComponentManager.operationManager.recordOperation(operationId); 
-
-                this.ignoreBindings = ignoreBindings; 
-
-                var response = this.setPropertyValue(propertyId,value,false);
-                window.holoComponentManager.operationManager.finishRecording(response.result);                        
-            } catch(e) {
-                var response = new Response(false);
-            }
-
-            this.ignoreBindings = false;
-            return response;
-    },    
-
-    setPropertyValuesForSkinAttributesInOperation: function(skinAttributeIds, operationId) {
+    setPropertyValuesForSkinAttributesInOperation: function(skinAttributeIds) {
         var presetValues = {};
 
         for (var i=0; i<skinAttributeIds.length; i++) {
@@ -1739,31 +1685,8 @@ HoloComponent.prototype = {
             } 
         }
 
-        try {
-            window.holoComponentManager.operationManager.recordOperation(operationId); 
-
-            this.ignoreBindings = true; 
-
-            var response = this.setPropertyValues(presetValues, false);
-            window.holoComponentManager.operationManager.finishRecording(response.result);                        
-        } catch(e) {
-            var response = new Response(false);
-        }
-
-        this.ignoreBindings = false;
-
-        return response;
+        return this.setPropertyValuesInOperation(presetValues)
         
-    },
-
-    testPropertyValueForSkinAttribute: function(skinAttributeId) {
-        var bindedPropertyId = this.skinAttributeBindingsToProperties[skinAttributeId];
-
-        if (bindedPropertyId) {
-            return this.testPropertyValue(bindedPropertyId, this.skinAttributes[skinAttributeId].getValue.call(this));
-        } else {
-            return new Response(true);
-        }
     },
 
     testPropertyValuesForSkinAttributes: function(skinAttributeIds) {

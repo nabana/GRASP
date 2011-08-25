@@ -377,7 +377,10 @@ GRASPPlayer.prototype = {
                 onValueChange: function (args) {
                     trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
 
-                    var respond = window.player.inspectedComponent.setPropertyValueInOperation(args.id, args.value, false);
+                    var changedPropeties = {};
+                    changedPropeties[args.id] = args.value;
+
+                    var respond = window.player.inspectedComponent.setPropertyValuesInOperation( changedPropeties , false);
 
                     if (!respond.result) {
                         var widget = this.propertyWidgets[args.id];
@@ -412,7 +415,10 @@ GRASPPlayer.prototype = {
                         onValueChange: function (args) {
                             trace("Value changed for ["+args.id+"] ["+args.value+"] ["+args.unitId+"]");
 
-                            var respond = window.player.inspectedComponent.setPropertyValueInOperation(args.id, args.value, false);
+                            var changedPropeties = {};
+                            changedPropeties[args.id] = args.value;
+
+                            var respond = window.player.inspectedComponent.setPropertyValuesInOperation( changedPropeties, false);
 
                             if (!respond.result) {
                                 var widget = this.propertyWidgets[args.id];

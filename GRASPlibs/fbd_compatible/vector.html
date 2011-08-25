@@ -154,13 +154,13 @@
             orientation: "left",
 
             rotateStop: function(angle) {
-                var respond = c.setPropertyValueForSkinAttributeInOperation('ellipseRotation');
+                var respond = c.setPropertyValuesForSkinAttributesInOperation(['ellipseRotation']);
                 return respond.result;
             },
             
 			rotateChange: function (oldangle, angle) {
                 $fbd.positionVectorLabel.call(c, angle);
-                var respond = c.testPropertyValueForSkinAttribute('ellipseRotation');
+                var respond = c.testPropertyValuesForSkinAttributes(['ellipseRotation']);
                 return respond.result;
 			},
             
@@ -171,7 +171,7 @@
             color: "blue",
 
             resizeStop: function(angle) {
-                var respond = c.setPropertyValuesForSkinAttributesInOperation(['ellipseWidth', 'ellipseHeight'], 'Resize Area of Origin');
+                var respond = c.setPropertyValuesForSkinAttributesInOperation(['ellipseWidth', 'ellipseHeight']);
                 return respond.result;
             },
             
@@ -203,13 +203,13 @@
             },
             
             rotateStop: function(angle) {
-                var respond = c.setPropertyValueForSkinAttributeInOperation('vectorRotation');
+                var respond = c.setPropertyValuesForSkinAttributesInOperation(['vectorRotation']);
                 return respond.result;
             },
             
 			rotateChange: function (oldangle, angle) {
                 $fbd.positionVectorLabel.call(c, angle);
-                var respond = c.testPropertyValueForSkinAttribute('vectorRotation');
+                var respond = c.testPropertyValuesForSkinAttributes(['vectorRotation']);
                 return respond.result;
 			},
 
