@@ -215,7 +215,7 @@ $.fn.numeric.keyup = function(e)
 			}
 		}
 		// set the value and prevent the cursor moving to the end
-		this.value = val;
+	//	this.value = val;
 		$.fn.setSelection(this, carat);
 	}
 }
@@ -233,6 +233,7 @@ $.fn.numeric.blur = function()
 			callback.apply(this);
 		}
 	}
+    return true;
 }
 
 $.fn.removeNumeric = function()

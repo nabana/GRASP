@@ -326,13 +326,8 @@ $xcng.widgets.TextField.prototype = {
                         'class': "propertyValue INPUT"+(this.quantity ? " numeric" : ""),
                         id: this.propertyInstanceDescriptor.id+"_input",
                         disabled: this.propertyTypeDescriptor.readonly ? true : false,
-                        change: function() {
-                            var host = $(this).data('host');
-                            host.propertyInstanceDescriptor.value = $(this).val();
-                            host._triggerChange.call(host);
-                        }
                     });
-                    inputE.numeric();
+                    //inputE.numeric();
                     if (this.quantity.isInteger && !this.quantity.isPositive) {
                         inputE.numeric({ decimal: false}, function() { alert(inputHint); this.value = ""; this.focus(); });
                     } else if (this.quantity.isInteger && this.quantity.isPositive) {
@@ -342,6 +337,13 @@ $xcng.widgets.TextField.prototype = {
                     } else {
                         inputE.numeric({ }, function() { alert(inputHint); this.value = ""; this.focus(); });
                     }
+
+                    inputE.change(function() {
+                            var host = $(this).data('host');
+                            host.propertyInstanceDescriptor.value = $(this).val();
+                            host._triggerChange.call(host);
+                        });
+
 
                     var control = inputE.after(unitE);
 

@@ -737,7 +737,7 @@ GRASPPlayer.prototype = {
         this.initClock();
         this.refreshmenu();
         $('#mousePosDisplay').disableSelection();
-        $('#mainContent').disableSelection();
+        $('html').disableSelection();
         window.player.operationManager.addEventListener("OPERATION_ACCESSED", this.refreshUndoRedo);
     },
 
