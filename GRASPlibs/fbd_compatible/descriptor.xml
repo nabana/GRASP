@@ -160,7 +160,13 @@
                         </variable>                
                     </members>
                 </group>
-
+                <variable id="Name" defaultValue="" label="Name" bindToSkinAttribute="componentLabel">
+                    <widget type="TextField">
+                        <parameters>
+                            <parameter id="width">80</parameter>
+                        </parameters>
+                    </widget>                  
+                </variable>
                 <variable id="Type" defaultValue="U" label="Type"  bindToSkinAttribute="componentLabel">
                     <widget type="DropDown">
                         <parameters>

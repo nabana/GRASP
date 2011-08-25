@@ -75,10 +75,15 @@
 
                 setValue: function (value) {
 
-                    /* trace("ehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"+value); */
+             //       trace("ehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"+value); 
                     var type = this.getPropertyValue("Type");
-                    this.setPropertyValue("symbol", type, true)
-                    this.skinParts.label.html(type+"<span class='sub'>"+this.getPropertyValue("screenId")+"</span>");
+                    var name = this.getPropertyValue("Name");
+
+                    if (!name || name == "") {
+                        this.skinParts.label.html(type+"<span class='sub'>"+this.getPropertyValue("screenId")+"</span>");
+                    } else {
+                        this.skinParts.label.html(name);
+                    }
 
                 },
 
