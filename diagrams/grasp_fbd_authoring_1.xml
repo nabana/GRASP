@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GRASPDiagram title="Sample diagram" libraryLocation="GRASPlibs/fbd_authoring" isTimed="false" showGrid="true" showInventory="true">
+<GRASPDiagram libraryLocation="GRASPlibs/fbd_authoring" isTimed="false" showGrid="true" showInventory="true">
   	<content>
   	</content>
 </GRASPDiagram>

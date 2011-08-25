@@ -54,7 +54,17 @@
 						</reference>
 					</memberType>
                 </set>
-				<variable id="BgImage" label="Image" inspectable="true" bindToSkinAttribute="BgImage" >
+				<variable id="Title" label="Title" inspectable="true" defaultValue="Problem title" bindToSkinAttribute="Title">
+					<description>
+						Title of the diagram
+					</description>
+                    <widget type="TextField">
+                        <parameters>
+                            <parameter id="width">140</parameter>                            
+                        </parameters>
+                    </widget>                     
+				</variable>                
+				<variable id="BgImage" label="Image" inspectable="true" bindToSkinAttribute="BgImage"  defaultValue="GRASPlibs/fbd_authoring/assets/test_img.png" >
 					<description>
 						Background of the canvas
 					</description>
@@ -62,6 +72,13 @@
                         <parameters>
                             <parameter id="width">140</parameter>
                         </parameters>
+                    </widget>                     
+				</variable>
+				<variable id="Instructions" label="Instructions" inspectable="true" bindToSkinAttribute="Instructions" defaultValue="Set instructions for this problem.">
+					<description>
+						Instructions for the problem
+					</description>
+                    <widget type="TextArea">
                     </widget>                     
 				</variable>
 				<variable id="Author" label="Author" inspectable="true" >
@@ -72,13 +89,6 @@
                         <parameters>
                             <parameter id="width">140</parameter>                            
                         </parameters>
-                    </widget>                     
-				</variable>
-				<variable id="Instructions" label="Instructions" inspectable="true" bindToSkinAttribute="Instructions" defaultValue="Set instructions for this problem.">
-					<description>
-						Instructions for the problem
-					</description>
-                    <widget type="TextArea">
                     </widget>                     
 				</variable>
                 

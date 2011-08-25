@@ -1371,6 +1371,7 @@ function HoloComponent(typeId, id, isDummy){
 
     trace("HoloComponent with id:[" + this.id + "] created.");
     this.skinInstanceFromTemplate = "";
+    this.skinParts = {};
 
     this.type = window.holoComponentManager.libraryManager.componentTypes[typeId];
 

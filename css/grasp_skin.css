@@ -128,7 +128,7 @@ textarea {
 	padding: 10px;
 }
 
-#settingsPanel .content,
+#filePanel .content,
 #helpPanel .content  {
     height: 450px;
     width: 800px;
@@ -242,12 +242,13 @@ div#mainContent {
 	color: #FF6600;
 }
 
-#saveButton {
-	background-image: url("../assets/save_off.png");
+#fileButton {
+	background-image: url("../assets/file_off.png");
+    padding: 0 8px !important;
 }
 
-#saveButton:hover, #saveButton:active  {
-	background-image: url("../assets/save_on.png");
+#fileButton:hover, #fileButton:active  {
+	background-image: url("../assets/file_on.png");
 }
 
 #previewButton {

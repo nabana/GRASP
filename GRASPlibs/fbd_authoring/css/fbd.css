@@ -16,9 +16,9 @@
 }
 
 .mainCanvas {
-	padding: 5px; 
-	height: 411px; 
-	width:950px; 
+	height: 421px; 
+	width:960px; 
+    position: absolute;
 }
 
 .mousePosDisplay {
@@ -69,4 +69,20 @@
 .selectedComponent .toleranceEllipse {
 	display: block;
 	border: none;
+}
+
+.instructionsHolder {
+    position: absolute;
+    bottom: 5px;
+    text-align: center;
+    width: 940px;
+    padding: 0px 10px 0px;
+}
+
+.bgImageContainer {
+    position: absolute;
+    width: 960px;
+    height: 420px;
+    background-repeat: no-repeat;
+    background-position: center center;
 }

@@ -236,7 +236,7 @@ GRASPPlayer.prototype = {
     clock: null,
 
     testBState: 0,
-    saveBState: 0,
+    fileBState: 0,
     undoBState: 0,
     redoBState: 0,
     settingsBState: 0,
@@ -564,17 +564,17 @@ GRASPPlayer.prototype = {
         menuHolder.append(menu);
 
         if (this._mode == "MODE_COMPOSE"){
-            this.testBState = 1;
-            this.saveBState = 1;
+            this.testBState = 0;
+            this.fileBState = 1;
             this.undoBState = (window.player.operationManager.lastDoneOperationIndex > -1) ? 1: 2;
             this.redoBState = (window.player.operationManager.lastDoneOperationIndex < window.player.operationManager.journal.length - 1) ? 1: 2;
-            this.settingsBState = 1;
+            this.settingsBState = 0;
         }
         if (this.testBState == 1){
             menu.append("<li id='previewButton'><a href='javascript:window.player.on_previewButton_click();' title='Preview'>Preview</a></li>")
         }
-        if (this.saveBState == 1){
-            menu.append("<li id='saveButton'><a href='javascript:window.player.on_saveButton_click();' title='Save'>Save</a></li>")
+        if (this.fileBState == 1){
+            menu.append("<li id='fileButton'><a href='javascript:window.player.on_fileButton_click();' title='File'>File</a></li>")
         }
         if (this.undoBState == 1){
             menu.append("<li id='undoButton'><a href='javascript:window.player.on_undoButton_click();' title='Undo \""+window.player.operationManager.journal[window.player.operationManager.lastDoneOperationIndex].label+"\"'>Undo</a></li>")
@@ -615,9 +615,8 @@ GRASPPlayer.prototype = {
         }
     },
 
-    refreshTitle: function(){
-        $("#title").empty();
-        $("#title").append(this.configDescriptor.title);
+    refreshTitle: function(title){
+        $("#title").text(title);
         //$("#title").disableSelection();	
     },
 
@@ -729,7 +728,6 @@ GRASPPlayer.prototype = {
     },
 
     setupUI: function(){
-        this.refreshTitle();
         this.refreshDescription();
         this.refreshInventory();
         this.initClock();
@@ -810,10 +808,9 @@ GRASPPlayer.prototype = {
 
     },
 
-    on_saveButton_click: function(){
-
-
-        },
+    on_fileButton_click: function(){
+        $('#filePanel').fadeIn();
+    },
 
     on_undoButton_click: function(){
         window.player.operationManager.undo.call(window.player.operationManager);
@@ -844,8 +841,8 @@ GRASPPlayer.prototype = {
 
         },
 
-    on_settingsPanel_close: function(){
-        $("[id='settingsPanel']").hide();
+    on_filePanel_close: function(){
+        $("[id='filePanel']").hide();
     },
 
     on_helpPanel_close: function(){

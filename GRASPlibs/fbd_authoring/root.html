@@ -34,12 +34,44 @@
 /*		window.player.mainCanvas.draggable({
 			containment: [-(4000-960),-(4000-540),0,0],
 		});
-*/	
+*/
+
+         this.skinAttributes = {
+
+            Instructions: {
+                setValue: function (value) {
+                    if (this.skinParts.instructionsHolder) this.skinParts.instructionsHolder.text(value);
+			    
+                },
+
+                getValue: function() {
+                    if (this.skinParts.instructionsHolder) {
+                        return this.skinParts.instructionsHolder.text();
+                    }
+                }
+            },
+
+            BgImage: {
+                setValue: function (value) {
+                    if (this.skinParts.bgImageContainer) this.skinParts.bgImageContainer.css('background-image', "url("+value+")");
+			    
+                }
+           },
+           
+           Title: {
+                setValue: function (value) {
+                    window.player.refreshTitle(value);			    
+                }
+           }
+           
+        }
 
 	};
 	
 	
  	__host__.on_render = function(){ 
+        this.skinParts.instructionsHolder = this.skinInstance.find('.instructionsHolder');
+        this.skinParts.bgImageContainer = this.skinInstance.find('.bgImageContainer');        
 	};
 	
 	__host__.on_drop = function(e, ui) {
@@ -78,5 +110,9 @@
 	}
 	
 </script>
+<div class="bgImageContainer"></div>
 <div class="mousePosDisplay">x:0 y:0</div>
-<div id="childContainer" style="" class="mainCanvas"></div>
+<div id="childContainer" style="" class="mainCanvas">
+   <div class="instructionsHolder"></div>
+</div>
+
