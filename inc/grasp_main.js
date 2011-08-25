@@ -271,6 +271,9 @@ GRASPPlayer.prototype = {
         trace("in renderPropertiesPanel");
         var c = window.holoComponentManager.getComponentById(id);
 
+        if (this._mode != "MODE_COMPOSE" && this.inspectedComponent) this.removePropertiesPanel();
+
+
         if (c && c.type.inspectable) {
             // setting up new propertiespanel
             
@@ -352,12 +355,20 @@ GRASPPlayer.prototype = {
 
 
             // for properties not belonging to any group
-            
+
+            var widgetType;
+
+            if (this._mode == "MODE_COMPOSE") {
+                widgetType = "INPUT";
+            } else {
+                widgetType = "DISPLAY";
+            }
+
             var freeList = new $xcng.widgets.WidgetList({
                 id: 'inputWidgetList_'+i+'_for_'+c.id, 
                 containerElement: listHolder, 
                 label: null, 
-                mode: 'INPUT', 
+                mode: widgetType, 
 
                 quantities: quantities,
                 propertyTypeDescriptors: propertyTypeDescriptors, 
@@ -392,7 +403,7 @@ GRASPPlayer.prototype = {
                         id: 'inputWidgetList_'+i+'_for_'+c.id+'_'+c.type.propertyGroups[i].id, 
                         containerElement: listHolder, 
                         label: c.type.propertyGroups[i].label, 
-                        mode: 'INPUT', 
+                        mode: widgetType, 
 
                         quantities: quantities,
                         propertyTypeDescriptors: propertyTypeDescriptors, 
@@ -855,7 +866,7 @@ GRASPPlayer.prototype = {
     on_component_mousedown: function(e){
         e.stopPropagation();
 
-        if (window.player.allowSelecting){
+        if (window.player.allowSelecting && window.player._mode == "MODE_COMPOSE"){
             var id = $(e.currentTarget).attr('id');
             window.player.selectedComponentIds = window.player.selectedComponentIds || [];
 			if (window.player.selectedComponentIds.indexOf(id) == -1) {
@@ -875,7 +886,9 @@ GRASPPlayer.prototype = {
             //    
             //     window.player.renderPropertiesPanelFor(id);
             // }
-        }        
+        } else {
+            window.player.removePropertiesPanel();
+        }
     },
 
     on_component_mouseup: function(e){

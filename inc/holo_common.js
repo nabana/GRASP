@@ -2185,7 +2185,7 @@ HoloComponent.prototype = {
         this._skinInstance.bind('mousedown', window.player.on_component_mousedown);
         this._skinInstance.bind('mouseup', window.player.on_component_mouseup);
 
-        if (this.getPropertyValue("draggable") == "true"){
+        if (this.getPropertyValue("draggable") == "true" && window.player && window.player._mode == "MODE_COMPOSE"){
             this.skinInstance.css("cursor", "move");
             this.skinInstance.disableSelection();
             if (isSet(this.type.propertyBindingsToSkinAttributes["positionX"]) ||
