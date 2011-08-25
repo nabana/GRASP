@@ -271,7 +271,7 @@ GRASPPlayer.prototype = {
         trace("in renderPropertiesPanel");
         var c = window.holoComponentManager.getComponentById(id);
 
-        if (this._mode != "MODE_COMPOSE" && this.inspectedComponent) this.removePropertiesPanel();
+        if (this.inspectedComponent) this.removePropertiesPanel();
 
 
         if (c && c.type.inspectable) {
@@ -552,9 +552,13 @@ GRASPPlayer.prototype = {
         var v1 = this.libraryManager.createNewComponentInstanceFromType("VectorType");
 		v1.moveTo(100,100);
 		
+        var c1 = this.libraryManager.createNewComponentInstanceFromType("CoupleType");
+		c1.moveTo(300,100);
+		
 		var rootChildrenSet = this.rootComponent.getProperty("children");
 
         rootChildrenSet.addMemberForValue(v1.id);
+        rootChildrenSet.addMemberForValue(c1.id);
     },
 
     refreshmenu: function(){
@@ -864,10 +868,11 @@ GRASPPlayer.prototype = {
 
     on_clock_over: function(){
 
-        },
+    },
 
     on_component_mousedown: function(e){
         e.stopPropagation();
+        e.preventDefault();
 
         if (window.player.allowSelecting && window.player._mode == "MODE_COMPOSE"){
             var id = $(e.currentTarget).attr('id');
@@ -882,7 +887,7 @@ GRASPPlayer.prototype = {
               }
 
             } else {
-                  window.player.removePropertiesPanel();                
+                  //window.player.removePropertiesPanel();                
             }
 
             // if (e.which == 3) {
@@ -1077,7 +1082,13 @@ GRASPComponent.prototype = {
                 }
             }
         }
-    }    
+    },    
+
+    on_Moved: function() {
+        if (window.player.inspectedComponent == this) {
+            window.player.renderPropertiesPanelFor(this.id);
+        }
+    }
 
 }
 

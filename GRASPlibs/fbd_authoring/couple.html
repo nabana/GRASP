@@ -7,21 +7,23 @@
         // setting up skinAttributes
         this.skinAttributes = {
 
-            vectorRotation: {
+            Orientation: {
                 setValue: function (value) {
-                    // context is host
-                    if (this.skinParts.arrowCanvas) this.skinParts.arrowCanvas.rotate(value);
-                    
-                    $fbd.positionVectorLabel.call(this, value);
-			    
+
+                    var img = this.skinParts.img;                    
+                    img.data('orientation', value);
+                    if (img.data('orientation') == "CCW") {
+                        img.attr("src","__libraryURL__/assets/couple_content_reflected.png");
+                        img.css('left', -21);
+                    } else {
+                        img.attr("src","__libraryURL__/assets/couple_content.png");
+                        img.css('left', -17);                        
+                    }
+
                 },
 
                 getValue: function() {
-//                    trace("***************************************************** "+this.skinParts.arrowCanvas.css('rotate'));                    
-                    if (this.skinParts.arrowCanvas) {
-                        var r = Number(this.skinParts.arrowCanvas.css('rotate'));
-                        return !isNaN(r) ? r : 0;
-                    }
+                    return this.skinParts.img.data('orientation');
                 }
             },
 
@@ -88,6 +90,8 @@
                         this.skinParts.label.html(name);
                     }
 
+                    $fbd.positionCoupleLabel.call(this, value);                    
+
                 },
 
             }
@@ -107,6 +111,9 @@
 		var img = $(this.skinInstance.find('[id="myImg"]'));		
 		
 		img.attr("src","__libraryURL__/assets/couple_content.png");
+        img.data('orientation', 'CW');
+
+        this.skinParts.img = img;
 
 	};
 	
@@ -182,7 +189,35 @@
 	
 	__host__.onSelect = function () {
 		
-        __host__.drawEllipse();		
+        __host__.drawEllipse();
+
+        var c = this;
+
+        var img = this.skinParts.img;
+
+        img.bind("mouseup", function(e) {
+//                e.preventDefault();
+            img.unbind("mouseup");
+            img.bind("mouseup", function(e) {
+
+                if (window.beingDraggedComponent != c && e.which == 1) {
+                    e.preventDefault();
+                   //e.stopPropagation();
+                    if (img.data('orientation') == "CW") {
+                        img.attr("src","__libraryURL__/assets/couple_content_reflected.png");
+                        img.css('left', -21);
+                        img.data('orientation', 'CCW');
+                    } else {
+                        img.attr("src","__libraryURL__/assets/couple_content.png");
+                        img.css('left', -17);                        
+                        img.data('orientation', 'CW');
+                    }
+
+                    var respond = c.setPropertyValuesForSkinAttributesInOperation(['Orientation']);
+                 }
+            });
+        });
+
 	};
 	
 	
@@ -196,6 +231,9 @@
 		ellipseCanvas.remove();
 
         this.skinParts.ellipseCanvas = null;
+
+        this.skinParts.img.unbind("click");
+        this.skinParts.img.unbind("mouseup");
 		
     };
     	
@@ -209,5 +247,5 @@
 <div id="base" class="coupleBase">
 	<p id="label" class="instanceLabel">Couple</p>
 	<div id="ellipseWrapper" ><canvas id="ellipseCanvas" class="toleranceEllipse layer" width="20"></canvas></div>    
-	<div class="content"><img id="myImg" class="coupleImage" width="44" height="39" class="nonselectable"/></div>
+	<div class="content"><img id="myImg" class="coupleImage borderedWhenSelected" width="44" height="39" class="nonselectable"/></div>
 </div>

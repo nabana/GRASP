@@ -9,7 +9,7 @@
         <quantity id="ForceMagnitude" symbol="F">
             <units>
                 <unit id="Newton" symbol="N" isBase="true" factor="1"/>
-                <unit id="Kilonewton" symbol="kN" factor="10000"/>
+     <!--           <unit id="Kilonewton" symbol="kN" factor="10000"/>-->
             </units>
         </quantity>
         <quantity id="Direction" symbol="dir">
@@ -229,7 +229,7 @@
                                 </parameters>
                             </widget>                        
                         </variable>
-                        <variable id="DirValid" label="Validate direction" defaultValue="unchecked">
+                        <variable id="DirValid" label="Validate direction" defaultValue="checked">
                             <widget type="CheckBox"/>
                         </variable>
 					</members>
@@ -318,7 +318,24 @@
 				if (!this.isDummy) {
 					this.setPropertyValues({"screenId": window.holoComponentManager.getComponentMaxCountByType(this.type.id)});
 				}
-			]]></onCreation>		
+			]]></onCreation>
+            <constraints>
+                <!-- <constraint><![CDATA[ -->
+                <!--     if (this.presetPropertyValues['CenterX'] != undefined && this.presetPropertyValues['CenterY'] != undefined) { -->
+                <!--        if (this.presetPropertyValues['CenterX'] > 200 || this.presetPropertyValues['CenterY'] > 200 ) { -->
+                <!--             return new Response(false, "WRONG_PLACE", this); -->
+                <!--        } -->
+                <!--     } -->
+                <!-- ]]></constraint> -->
+                <constraint><![CDATA[
+                    if (this.presetPropertyValues['MajorAxis'] != undefined || this.presetPropertyValues['MinorAxis'] != undefined) {
+                       if (this.presetPropertyValues['MajorAxis'] < 30 || this.presetPropertyValues['MinorAxis'] < 30 ||
+                           this.presetPropertyValues['MajorAxis'] > 150 || this.presetPropertyValues['MinorAxis'] > 150  ) {
+                            return new Response(false, "WRONG_ELLIPSE_SIZE", this);
+                       }
+                    }
+                ]]></constraint>
+           </constraints> 
           <properties>
 				<variable id="symbol" label="Symbol" defaultValue="C" readonly="true">
 					<description>
@@ -336,7 +353,7 @@
                     </widget>                     
 				</variable>
 
-                <group id="magnitudeProperties" label="Magnitude">
+                <group id="magnitudeProperties" label="Magnitude" inspectable="false">
                     <members>
                         <variable id="Magnitude" label="Magnitude" defaultValue="1" quantity="ForceMagnitude">
                             <widget type="TextField">
@@ -372,51 +389,35 @@
                     </widget>
                     <possibleValues>
                         <value key="U">Undefined</value>
-                        <value key="W">Weight</value>
-                        <value key="E">Electrical Force</value>
-                        <value key="M">Magnetic Force</value>
-                        <value key="F">Applied Force</value>
-                        <value key="T">Tension</value>
-                        <value key="L">Muscle Force</value>
-                        <value key="N">Normal Force</value>
-                        <value key="ff">Friction Force</value>
-                        <value key="R">General Reaction Force</value>
-                        <value key="Rx">GRF, Horizontal Component</value>
-                        <value key="Ry">GRF, Vertical Component</value>
-                        <value key="J">Joint Reaction Force</value>
-                        <value key="Jx">JRF, Horizontal Component</value>
-                        <value key="Jy">JRF, Vertical Component</value>
+                        <value key="A">Applied</value>
+                        <value key="R">Reaction</value>
                     </possibleValues>
                 </variable>
 
-                <group id="Direction" label="Direction">
+                <group id="Direction" label="Orientation">
                 	<members>
-		                <variable id="Direction" quantity="Direction" label="Rot" bindToSkinAttribute="vectorRotation"  defaultValue="0">
+		                <variable id="Direction" label="Orientation" bindToSkinAttribute="Orientation"  defaultValue="CW">
 		                    <description>
-		                        Direction
+		                        Orientation
 		                    </description>
-                        	<dictionary>
-                	        	<term id="WRONG_DIRECTION">Wrong direction.</term>
-                        	</dictionary>                            
-							<constraints>
-								<constraint><![CDATA[
-									 if (this.presetValue>275 && this.presetValue<=360) return new Response(false, "WRONG_DIRECTION", this);
-								]]></constraint>
-							</constraints>
-                            <widget type="TextField">
+                            <widget type="DropDown">
                                 <parameters>
-                                    <parameter id="width">40</parameter>
+                                    <parameter id="width">150</parameter>
                                 </parameters>
                             </widget>
+                            <possibleValues>
+                                <value key="CW">Clockwise</value>
+                                <value key="CCW">Counter-clockwise</value>
+                            </possibleValues>
 		                </variable>
-                        <variable id="DirectionFuzz" label="Direction fuzziness" defaultValue="3">
+                        <variable id="DirectionFuzz" label="Direction fuzziness" defaultValue="0" inspectable="false">
                             <widget type="TextField">
                                 <parameters>
                                     <parameter id="width">40</parameter>
                                 </parameters>
                             </widget>                        
                         </variable>
-                        <variable id="DirValid" label="Validate direction" defaultValue="unchecked">
+                        <variable id="DirValid" label="Validate direction" defaultValue="unchecked" inspectable="false">
                             <widget type="CheckBox"/>
                         </variable>
 					</members>

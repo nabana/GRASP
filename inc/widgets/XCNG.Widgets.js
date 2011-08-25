@@ -567,12 +567,12 @@ $xcng.widgets.CheckBox.prototype = {
                     disabled: this.propertyTypeDescriptor.readonly ? true : false,
                     change: function() {
                         var host = $(this).data('host');
-                        host.propertyInstanceDescriptor.value = this.checked;
+                        host.propertyInstanceDescriptor.value = (this.checked) ? "checked" : "unchecked";
                         host._triggerChange.call(host);
                     }
                 });
 
-                control.attr('checked', this.propertyInstanceDescriptor.value);
+                control.attr('checked', this.propertyInstanceDescriptor.value == "checked" ? true:false );
 
                 break;
             

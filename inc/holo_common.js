@@ -1977,6 +1977,11 @@ HoloComponent.prototype = {
         if (response.result) {
 		  this.skinInstance.css("left", xC);
           this.skinInstance.css("top", yC);
+        
+          if ($.isFunction(this.on_Moved)) {
+            this.on_Moved.call(this);
+          }
+          
         } else {
           var p = this.skinInstance.data("originalPos");
           if (isSet(p)) {
@@ -1990,7 +1995,7 @@ HoloComponent.prototype = {
 //                defaultValue
           }
         }
-        
+
         return response; 
                 
       }
@@ -2121,13 +2126,13 @@ HoloComponent.prototype = {
                         var c = window.holoComponentManager.getComponentById(this.id);
                         c.testMoveTo(c.getX(), c.getY());
                     },
-                    start: function(event, ui){
-                    },
                     start: function(event, ui) {
                         var me = $(this);
                         me.data("originalPos", me.position());
+                        window.beingDraggedComponent = window.holoComponentManager.getComponentById(this.id);
                     },
                     stop: function(event, ui){
+                        window.beingDraggedComponent = null;
                         window.holoComponentManager.operationManager.recordOperation("Move component"); 
 
                         var c = window.holoComponentManager.getComponentById(this.id);

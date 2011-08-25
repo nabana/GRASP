@@ -11,3 +11,9 @@ $fbd.positionVectorLabel = function (angle) {
     }
 
 }
+
+$fbd.positionCoupleLabel = function (angle) {
+    var label = this.skinParts.label;
+    var w = this.skinParts.label.width();
+    label.css("left", -w/2+3);	
+}
