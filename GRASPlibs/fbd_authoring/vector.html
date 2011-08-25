@@ -78,10 +78,13 @@
              //       trace("ehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"+value); 
                     var type = this.getPropertyValue("Type");
                     var name = this.getPropertyValue("Name");
+                    var screenId = this.getPropertyValue("screenId");
 
                     if (!name || name == "") {
-                        this.skinParts.label.html(type+"<span class='sub'>"+this.getPropertyValue("screenId")+"</span>");
+                        this.setPropertyValues({'symbol':type+screenId});
+                        this.skinParts.label.html(type+"<span class='sub'>"+screenId+"</span>");
                     } else {
+                        this.setPropertyValues({'symbol':name});                        
                         this.skinParts.label.html(name);
                     }
 

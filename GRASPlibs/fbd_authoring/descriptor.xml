@@ -74,7 +74,7 @@
                         </parameters>
                     </widget>                     
 				</variable>
-				<variable id="Instructions" label="Instructions" inspectable="true" bindToSkinAttribute="Instructions" >
+				<variable id="Instructions" label="Instructions" inspectable="true" bindToSkinAttribute="Instructions" defaultValue="Set instructions for this problem.">
 					<description>
 						Instructions for the problem
 					</description>

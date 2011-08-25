@@ -278,7 +278,7 @@ GRASPPlayer.prototype = {
             // setting up new propertiespanel
             
             var symbolTxt = c.getPropertyValue('symbol');
-            var screenIdTxt = c.getPropertyValue('screenId');
+            var screenIdTxt = '';//c.getPropertyValue('screenId');
             
             var titleTxt;
 
@@ -1067,7 +1067,20 @@ GRASPComponent.prototype = {
                 }
             }
         }
-    }
+    },
+
+    on_setPropertyValues: function(response) {
+        if (window.player.inspectedComponent == this) {
+            for (var i in this.presetPropertyValues) {
+                var widget = window.player.propertyWidgets[i];
+                if (widget) {
+                    widget.propertyInstanceDescriptor.value = this.getPropertyValue(i);
+                    widget.propertyInstanceDescriptor.valid = true;
+                    widget.render();
+                }
+            }
+        }
+    }    
 
 }
 
